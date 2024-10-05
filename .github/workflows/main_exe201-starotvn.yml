@@ -57,6 +57,10 @@ jobs:
         with:
           name: .net-app
           path: ./artifact
+
+        # Inspect the downloaded artifact
+      - name: List contents of artifact
+        run: dir ./artifact /s
       
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
