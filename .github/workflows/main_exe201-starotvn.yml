@@ -37,12 +37,16 @@ jobs:
       - name: Publish project
         run: dotnet publish Exe.Starot.Api/Exe.Starot.Api.csproj --configuration Release --output ./publish
 
+      # Debugging step: List the contents of the ./publish folder
+      - name: Verify publish folder contents
+        run: ls -la ./publish
+
       # Upload artifact for deployment job
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
-          name: .net-app
-          path: ./publis
+          name: net-app
+          path: ./publish
 
   deploy:
     runs-on: windows-latest
@@ -63,5 +67,5 @@ jobs:
         with:
           app-name: 'exe201-starotvn'
           slot-name: 'Production'
-          package: .
+          package: ./publish
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_4A7B51B76E914A6BAA0C109D2771FAF8 }}
