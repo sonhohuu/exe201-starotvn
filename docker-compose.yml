@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  exe.starot.api:
+    image: ${DOCKER_REGISTRY-}exestarotapi
+    build:
+      context: .
+      dockerfile: Exe.Starot.Api/Dockerfile
+    ports:
+      - "9000:8080"   # Map port 8080 in the container to port 9000 on the host
+      - "9001:8081"   # Map port 8081 in the container to port 9001 on the host
+    environment:
+      - ConnectionStrings__local=Server=sqlserver;Database=Exe201-Starot;User=sa;Password=Son@290103;TrustServerCertificate=true;MultipleActiveResultSets=True;Encrypt=False
+    depends_on:
+      - sqlserver
+    
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - SA_PASSWORD=Son@290103
+      - ACCEPT_EULA=Y
+    ports:
+      - "1433:1433"   # Expose SQL Server on port 1433
+    volumes:
+      - sql-data:/var/opt/mssql
+      
+volumes:
+  sql-data:
