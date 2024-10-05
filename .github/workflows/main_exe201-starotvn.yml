@@ -41,7 +41,7 @@ jobs:
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
-          name: net-app
+          name: .net-app
           path: Exe.Starot.Api/bin/Release/netcoreapp3.1/publish
 
   deploy:
