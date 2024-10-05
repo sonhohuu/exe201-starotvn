@@ -68,5 +68,5 @@ jobs:
         with:
           app-name: 'exe201-starotvn'
           slot-name: 'Production'
-          package: './artifact/publish'
+          package: './artifact'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_4A7B51B76E914A6BAA0C109D2771FAF8 }}
