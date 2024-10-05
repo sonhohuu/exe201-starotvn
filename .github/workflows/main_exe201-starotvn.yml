@@ -36,11 +36,7 @@ jobs:
       # New step: Publish project
       - name: Publish project
         run: dotnet publish Exe.Starot.Api/Exe.Starot.Api.csproj --configuration Release --output ./publish
-
-      # Debugging step: List the contents of the ./publish folder
-      - name: Verify publish folder contents
-        run: ls -la ./publish
-
+        
       # Upload artifact for deployment job
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
