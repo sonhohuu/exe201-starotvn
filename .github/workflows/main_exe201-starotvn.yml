@@ -21,17 +21,28 @@ jobs:
         with:
           dotnet-version: '3.1'
 
-      - name: Build with dotnet
-        run: dotnet build --configuration Release
+      # New step: Restore dependencies
+      - name: Restore dependencies
+        run: dotnet restore Exe.Starot.Api/Exe.Starot.Api.csproj
 
-      - name: dotnet publish
-        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
+      # New step: Build the project
+      - name: Build project
+        run: dotnet build Exe.Starot.Api/Exe.Starot.Api.csproj --configuration Release --no-restore
 
+      # New step: Run tests
+      - name: Run tests
+        run: dotnet test Exe.Starot.Api/Exe.Starot.Api.csproj --no-build --verbosity normal
+
+      # New step: Publish project
+      - name: Publish project
+        run: dotnet publish Exe.Starot.Api/Exe.Starot.Api.csproj --configuration Release --output ./publish
+
+      # Upload artifact for deployment job
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: .net-app
-          path: ${{env.DOTNET_ROOT}}/myapp
+          path: ./publis
 
   deploy:
     runs-on: windows-latest
