@@ -42,7 +42,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: net-app
-          path: ./publish
+          path: Exe.Starot.Api/bin/Release/netcoreapp3.1/publish
 
   deploy:
     runs-on: windows-latest
