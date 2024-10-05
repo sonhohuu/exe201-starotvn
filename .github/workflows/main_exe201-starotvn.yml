@@ -60,7 +60,7 @@ jobs:
 
         # Inspect the downloaded artifact
       - name: List contents of artifact
-        run: dir ./artifact /s
+        run: Get-ChildItem -Recurse ./artifact
       
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
