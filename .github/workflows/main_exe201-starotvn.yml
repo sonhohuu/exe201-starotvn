@@ -11,7 +11,7 @@ on:
 
 env:
   AZURE_WEBAPP_NAME: exe201-starotvn
-  AZURE_WEBAPP_PACKAGE_PATH: "./publish"
+  AZURE_WEBAPP_PACKAGE_PATH: "./artifact/publish"
 
 jobs:
   build:
@@ -64,5 +64,5 @@ jobs:
         with:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
           slot-name: 'Production'
-          package: "${{ env.AZURE_WEBAPP_PACKAGE_PATH }}"
+          package: "${{env.AZURE_WEBAPP_PACKAGE_PATH}}"
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_4A7B51B76E914A6BAA0C109D2771FAF8 }}
