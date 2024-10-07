@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Exe.Starot.Application.Customer.Queries.Filter
 {
-    public class CustomerFilterQuery : IRequest<PagedResult<CustomerDTO>>
+    public class FilterCustomerQuery : IRequest<PagedResult<CustomerDTO>>
     {
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
@@ -20,7 +20,7 @@ namespace Exe.Starot.Application.Customer.Queries.Filter
         public int PageSize { get; set; } = 10;
     }
 
-    public class FilterCustomerQueryHandler : IRequestHandler<CustomerFilterQuery, PagedResult<CustomerDTO>>
+    public class FilterCustomerQueryHandler : IRequestHandler<FilterCustomerQuery, PagedResult<CustomerDTO>>
     {
         private readonly ICustomerRepository _customerRepository;
         private readonly IMapper _mapper;
@@ -31,7 +31,7 @@ namespace Exe.Starot.Application.Customer.Queries.Filter
             _mapper = mapper;
         }
 
-        public async Task<PagedResult<CustomerDTO>> Handle(CustomerFilterQuery request, CancellationToken cancellationToken)
+        public async Task<PagedResult<CustomerDTO>> Handle(FilterCustomerQuery request, CancellationToken cancellationToken)
         {
             // Fetch all customers that are not soft-deleted
             var customers = await _customerRepository.FindAllAsync(c => c.DeletedDay == null, cancellationToken);

@@ -35,6 +35,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Exe.Starot.Application\Exe.Starot.Application.csproj" />
     <ProjectReference Include="..\Exe.Starot.Domain\Exe.Starot.Domain.csproj" />
+    <ProjectReference Include="..\Exe.Starot.Infrastructure\Exe.Starot.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>
