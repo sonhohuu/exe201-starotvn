@@ -19,8 +19,9 @@ namespace Exe.Starot.Api
 
         public void ConfigureServices(IServiceCollection services)
         {
+            // Add necessary services
             services.AddControllers(opt => opt.Filters.Add(typeof(ExceptionFilter)));
-                    
+
             services.AddSignalR();
             services.AddScoped<OrderService>();
             services.AddApplication(Configuration);
@@ -29,7 +30,8 @@ namespace Exe.Starot.Api
             services.ConfigureApiVersioning();
             services.AddInfrastructure(Configuration);
             services.ConfigureSwagger(Configuration);
-         
+
+            // CORS policy
             services.AddCors(options =>
             {
                 options.AddPolicy("CorsPolicy",
@@ -40,9 +42,10 @@ namespace Exe.Starot.Api
                         .AllowCredentials());
             });
 
+            // Register System.Text.Encoding
             System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
 
-            // Additional logging
+            // Validate FirebaseConfig section
             var firebaseSection = Configuration.GetSection("FirebaseConfig");
             if (!firebaseSection.Exists())
             {
@@ -61,25 +64,29 @@ namespace Exe.Starot.Api
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            // Development error page
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
+            else
+            {
+                app.UseExceptionHandler("/Home/Error"); // Handle exceptions in production
+            }
 
+            app.UseHttpsRedirection();
             app.UseRouting();
             app.UseCors("CorsPolicy");
             app.UseSerilogRequestLogging();
-            app.UseExceptionHandler();
-            app.UseHttpsRedirection();
-            app.UseRouting();
+
             app.UseAuthentication();
             app.UseAuthorization();
 
+            // Endpoint configuration
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
                 endpoints.MapHub<NotificationHub>("/notificationHub");
-
             });
 
             app.UseSwashbuckle(Configuration);

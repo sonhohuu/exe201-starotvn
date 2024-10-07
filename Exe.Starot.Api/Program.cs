@@ -1,14 +1,12 @@
-using Exe.Starot.Domain.Entities.Repositories;
-using Exe.Starot.Infrastructure;
-using Exe.Starot.Infrastructure.Repositories;
-using MediatR;
-using Exe.Starot.Application.Common.Interfaces;
-using Exe.Starot.Api.Services;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Hosting;
-using Serilog.Events;
-using Serilog;
 using Exe.Starot.Api;
+using Exe.Starot.Application.Common.Interfaces;
+using Exe.Starot.Infrastructure;
+using MediatR;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
+using Serilog;
+using Serilog.Events;
+
 public static class Program
 {
     public static void Main(string[] args)
@@ -43,12 +41,6 @@ public static class Program
                 config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                       .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true, reloadOnChange: true)
                       .AddEnvironmentVariables();
-
-                // Build the configuration
-                var builtConfig = config.Build();
-
-                // Load the EmailSettings and set the singleton instance
-         
             })
             .UseSerilog((context, services, configuration) => configuration
                 .ReadFrom.Configuration(context.Configuration)
@@ -61,4 +53,3 @@ public static class Program
                 webBuilder.UseStartup<Startup>();
             });
 }
-
