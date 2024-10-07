@@ -14,9 +14,6 @@ namespace Exe.Starot.Application.Order.Create
             Products = products;
            
         }
-
-     
-        public decimal Total { get; set; } = 0;
         public List<RequestItem> Products { get; set; }
     }
 

@@ -18,7 +18,7 @@ namespace Exe.Starot.Application.Product
         public string Code { get; set; }
         public string Content { get; set; }
         public string Description { get; set; }
-        public string UrL { get; set; }
+        public string Image { get; set; }
         public void Mapping(Profile profile)
         {
 

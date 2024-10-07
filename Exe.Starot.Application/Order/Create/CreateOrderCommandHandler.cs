@@ -59,8 +59,7 @@ namespace Exe.Starot.Application.Order.Create
                 Status = "Pending",
                 Code = GenerateOrderCode(),
                 CreatedBy = _currentUserService.UserId,
-                OrderDate = DateTime.UtcNow.AddHours(7),
-                CreatedDate = DateTime.UtcNow.AddHours(7),
+                CreatedDate = DateTime.UtcNow,
                 Total = 0 
             };
 
@@ -85,7 +84,7 @@ namespace Exe.Starot.Application.Order.Create
                     Amount = item.Quantity,
                     UnitPrice = product.Price,
                     Price = productPrice,
-                    CreatedDate = DateTime.UtcNow.AddHours(7),
+                    CreatedDate = DateTime.UtcNow,
                     Status = true
                 };
                 _orderDetailRepository.Add(orderDetail);
