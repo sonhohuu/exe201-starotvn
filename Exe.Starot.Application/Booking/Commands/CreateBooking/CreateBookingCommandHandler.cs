@@ -70,7 +70,7 @@ namespace Exe.Starot.Application.Booking.Commands.CreateBooking
                 throw new DuplicateWaitObjectException("This booking already exists.");
             }
 
-            var existingReader = await _readerRepository.FindAsync(x => x.ID == request.ReaderId && !x.DeletedDay.HasValue,cancellationToken);
+            var existingReader = await _readerRepository.FindAsync(x => x.User.ID == request.ReaderId && !x.DeletedDay.HasValue,cancellationToken);
 
             if (existingBooking != null)
             {
