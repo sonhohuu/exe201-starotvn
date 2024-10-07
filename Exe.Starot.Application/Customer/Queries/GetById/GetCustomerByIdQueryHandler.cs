@@ -20,13 +20,11 @@ namespace Exe.Starot.Application.Customer.Queries.GetById
     public class GetCustomerByIdQueryHandler : IRequestHandler<GetCustomerByIdQuery, CustomerDTO>
     {
         private readonly ICustomerRepository _customerRepository;
-        private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
 
-        public GetCustomerByIdQueryHandler(ICustomerRepository customerRepository, IUserRepository userRepository, IMapper mapper)
+        public GetCustomerByIdQueryHandler(ICustomerRepository customerRepository, IMapper mapper)
         {
             _customerRepository = customerRepository;
-            _userRepository = userRepository;
             _mapper = mapper;
         }
 

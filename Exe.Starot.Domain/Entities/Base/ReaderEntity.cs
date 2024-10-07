@@ -17,6 +17,7 @@ namespace Exe.Starot.Domain.Entities.Base
         public string Image { get; set; } = string.Empty;
         public string LinkUrl { get; set; } = string.Empty;
         public string Introduction { get; set; } = string.Empty;
+        public string Expertise {  get; set; } = string.Empty;
         public string Experience { get; set; } = string.Empty;
 
         public virtual UserEntity User { get; set; }

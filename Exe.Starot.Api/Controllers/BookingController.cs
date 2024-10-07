@@ -148,7 +148,7 @@ namespace Exe.Starot.Api.Controllers
 
                 if (result == null)
                 {
-                    return NotFound(new JsonResponse<string>(StatusCodes.Status404NotFound,"PackageQuestion not found.",""));
+                    return NotFound(new JsonResponse<string>(StatusCodes.Status404NotFound,"Booking not found.",""));
                 }
 
                 return Ok(new JsonResponse<BookingDTO>(StatusCodes.Status200OK, "Get Sucess", result));

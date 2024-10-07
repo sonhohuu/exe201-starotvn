@@ -247,6 +247,7 @@ namespace Exe.Starot.Infrastructure.Migrations
                     Image = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     LinkUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Introduction = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Expertise = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Experience = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -443,19 +444,19 @@ namespace Exe.Starot.Infrastructure.Migrations
                 columns: new[] { "ID", "CreatedBy", "CreatedDate", "DateOfBirth", "DeletedBy", "DeletedDay", "Email", "FirstName", "Image", "LastName", "LastUpdated", "PasswordHash", "Phone", "RefreshToken", "RefreshTokenExpiryTime", "RefreshTokenIssuedAt", "Role", "UpdatedBy" },
                 values: new object[,]
                 {
-                    { "user1", null, new DateTime(2024, 10, 4, 22, 15, 23, 1, DateTimeKind.Utc).AddTicks(8416), new DateTime(1990, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "customer@gmail.com", "John", "", "Doe", new DateTime(2024, 10, 4, 22, 15, 23, 1, DateTimeKind.Utc).AddTicks(8416), "$2a$11$8eJ7nAWAKLwGKBGSUN.X2e1PnfT8OFLkC5y7tWzWE35gvDFXyNmBa", "123456789", null, new DateTime(2024, 11, 3, 22, 15, 23, 142, DateTimeKind.Utc).AddTicks(8140), new DateTime(2024, 10, 4, 22, 15, 23, 142, DateTimeKind.Utc).AddTicks(8149), "Customer", null },
-                    { "user2", null, new DateTime(2024, 10, 4, 22, 15, 23, 142, DateTimeKind.Utc).AddTicks(8260), new DateTime(1992, 2, 2, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "reader@gmail.com", "Jane", "", "Smith", new DateTime(2024, 10, 4, 22, 15, 23, 142, DateTimeKind.Utc).AddTicks(8260), "$2a$11$HeoRwsQ9pSDzTJnYP0C5KOuVeX7LItbggeS0fwVhNlxiCV8M8oP.y", "987654321", null, new DateTime(2024, 11, 3, 22, 15, 23, 288, DateTimeKind.Utc).AddTicks(8140), new DateTime(2024, 10, 4, 22, 15, 23, 288, DateTimeKind.Utc).AddTicks(8147), "Reader", null }
+                    { "user1", null, new DateTime(2024, 10, 7, 8, 13, 49, 795, DateTimeKind.Utc).AddTicks(4891), new DateTime(1990, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "customer@gmail.com", "John", "", "Doe", new DateTime(2024, 10, 7, 8, 13, 49, 795, DateTimeKind.Utc).AddTicks(4891), "$2a$11$.UE.yjCrVXmrN.TZCTH8zuXOOBUDfok0uuC9/fleBpR/avx1/.HhS", "123456789", null, new DateTime(2024, 11, 6, 8, 13, 49, 926, DateTimeKind.Utc).AddTicks(9987), new DateTime(2024, 10, 7, 8, 13, 49, 926, DateTimeKind.Utc).AddTicks(9995), "Customer", null },
+                    { "user2", null, new DateTime(2024, 10, 7, 8, 13, 49, 927, DateTimeKind.Utc).AddTicks(78), new DateTime(1992, 2, 2, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "reader@gmail.com", "Jane", "", "Smith", new DateTime(2024, 10, 7, 8, 13, 49, 927, DateTimeKind.Utc).AddTicks(78), "$2a$11$wlIEd9njx1/ldlLXZn7zW.VSWNeIrxDT6x.1Bv5ipxNw2NASnCOZq", "987654321", null, new DateTime(2024, 11, 6, 8, 13, 50, 59, DateTimeKind.Utc).AddTicks(1000), new DateTime(2024, 10, 7, 8, 13, 50, 59, DateTimeKind.Utc).AddTicks(1010), "Reader", null }
                 });
 
             migrationBuilder.InsertData(
                 table: "Customers",
                 columns: new[] { "ID", "CreatedBy", "CreatedDate", "DeletedBy", "DeletedDay", "LastUpdated", "Membership", "UpdatedBy", "UserId" },
-                values: new object[] { "customer1", null, new DateTime(2024, 10, 4, 22, 15, 23, 288, DateTimeKind.Utc).AddTicks(8883), null, null, new DateTime(2024, 10, 4, 22, 15, 23, 288, DateTimeKind.Utc).AddTicks(8883), 0, null, "user1" });
+                values: new object[] { "customer1", null, new DateTime(2024, 10, 7, 8, 13, 50, 59, DateTimeKind.Utc).AddTicks(1739), null, null, new DateTime(2024, 10, 7, 8, 13, 50, 59, DateTimeKind.Utc).AddTicks(1739), 0, null, "user1" });
 
             migrationBuilder.InsertData(
                 table: "Readers",
-                columns: new[] { "ID", "CreatedBy", "CreatedDate", "DeletedBy", "DeletedDay", "Experience", "ExperienceYears", "Image", "Introduction", "LastUpdated", "LinkUrl", "Quote", "Rating", "UpdatedBy", "UserId" },
-                values: new object[] { "reader1", null, new DateTime(2024, 10, 4, 22, 15, 23, 288, DateTimeKind.Utc).AddTicks(9013), null, null, "Experienced in tarot reading, astrology, and palmistry.", 5, "default_image.png", "I am a seasoned reader with years of experience.", new DateTime(2024, 10, 4, 22, 15, 23, 288, DateTimeKind.Utc).AddTicks(9013), "http://johndoe.com", "I foresee great things!", 4.8m, null, "user2" });
+                columns: new[] { "ID", "CreatedBy", "CreatedDate", "DeletedBy", "DeletedDay", "Experience", "ExperienceYears", "Expertise", "Image", "Introduction", "LastUpdated", "LinkUrl", "Quote", "Rating", "UpdatedBy", "UserId" },
+                values: new object[] { "reader1", null, new DateTime(2024, 10, 7, 8, 13, 50, 59, DateTimeKind.Utc).AddTicks(1847), null, null, "Experienced in tarot reading, astrology, and palmistry.", 5, "", "default_image.png", "I am a seasoned reader with years of experience.", new DateTime(2024, 10, 7, 8, 13, 50, 59, DateTimeKind.Utc).AddTicks(1847), "http://johndoe.com", "I foresee great things!", 4.8m, null, "user2" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Bookings_CustomerId",
