@@ -11,10 +11,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Remove="appsettings.json" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Asp.Versioning.Mvc" Version="8.1.0" />
     <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.1.0" />
     <PackageReference Include="AspNetCore.HealthChecks.SqlServer" Version="8.0.2" />
@@ -37,10 +33,6 @@
     <ProjectReference Include="..\Exe.Starot.Application\Exe.Starot.Application.csproj" />
     <ProjectReference Include="..\Exe.Starot.Domain\Exe.Starot.Domain.csproj" />
     <ProjectReference Include="..\Exe.Starot.Infrastructure\Exe.Starot.Infrastructure.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="appsettings.json" />
   </ItemGroup>
 
 </Project>

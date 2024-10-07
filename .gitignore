@@ -419,6 +419,3 @@ FodyWeavers.xsd
 1
 
 # Ignore appsettings.json
-Exe.Starot.Api/appsettings.json
-appsettings.json
-appsettings.Development.json
