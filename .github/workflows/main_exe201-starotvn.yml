@@ -1,6 +1,3 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-
 name: Build and deploy ASP.Net Core app to Azure Web App - exe201-starotvn
 
 on:
@@ -25,24 +22,24 @@ jobs:
         with:
           dotnet-version: '8.x'
 
-      # New step: Restore dependencies
+      # Restore dependencies
       - name: Restore dependencies
         run: dotnet restore ./Exe.StarotSolution.sln
 
-      # New step: Build the project
+      # Build the project
       - name: Build project
         run: dotnet build ./Exe.StarotSolution.sln --configuration Release --no-restore
 
-      # New step: Publish project
+      # Publish project
       - name: Publish project
-        run: dotnet publish ./Exe.StarotSolution.sln --configuration Release --output '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}'
+        run: dotnet publish ./Exe.StarotSolution.sln --configuration Release --output './publish'
         
       # Upload artifact for deployment job
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: net-app
-          path: ./publish
+          path: ./publish # Uploading the publish directory as the artifact
 
   deploy:
     runs-on: windows-latest
@@ -56,13 +53,13 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: net-app
-          path: ./artifact
-      
+          path: ./artifact # Downloading artifact to this location
+
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
           slot-name: 'Production'
-          package: "${{ env.AZURE_WEBAPP_PACKAGE_PATH }}"
+          package: "${{ env.AZURE_WEBAPP_PACKAGE_PATH }}" # Ensure this points to the correct artifact path
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_4A7B51B76E914A6BAA0C109D2771FAF8 }}
