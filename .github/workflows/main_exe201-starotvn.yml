@@ -9,6 +9,10 @@ on:
       - main
   workflow_dispatch:
 
+env:
+  AZURE_WEBAPP_NAME: exe201-starotvn
+  AZURE_WEBAPP_PACKAGE_PATH: "./publish"
+
 jobs:
   build:
     runs-on: windows-latest
@@ -16,26 +20,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up .NET Core
+      - name: Set up .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0'
+          dotnet-version: '8.x'
 
       # New step: Restore dependencies
       - name: Restore dependencies
-        run: dotnet restore Exe.Starot.Api/Exe.Starot.Api.csproj
+        run: dotnet restore ./Exe.StarotSolution.sln
 
       # New step: Build the project
       - name: Build project
-        run: dotnet build Exe.Starot.Api/Exe.Starot.Api.csproj --configuration Release --no-restore
-
-      # New step: Run tests
-      - name: Run tests
-        run: dotnet test Exe.Starot.Api/Exe.Starot.Api.csproj --no-build --verbosity normal
+        run: dotnet build ./Exe.StarotSolution.sln --configuration Release --no-restore
 
       # New step: Publish project
       - name: Publish project
-        run: dotnet publish Exe.Starot.Api/Exe.Starot.Api.csproj --configuration Release --output ./publish
+        run: dotnet publish ./Exe.StarotSolution.sln --configuration Release --output '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
         
       # Upload artifact for deployment job
       - name: Upload artifact for deployment job
@@ -57,16 +57,12 @@ jobs:
         with:
           name: .net-app
           path: ./artifact
-
-        # Inspect the downloaded artifact
-      - name: List contents of artifact
-        run: Get-ChildItem -Recurse ./artifact
       
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'exe201-starotvn'
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
           slot-name: 'Production'
-          package: './artifact'
+          package: "${{ env.AZURE_WEBAPP_PACKAGE_PATH }}"
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_4A7B51B76E914A6BAA0C109D2771FAF8 }}

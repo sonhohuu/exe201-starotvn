@@ -48,7 +48,7 @@ namespace Exe.Starot.Application.Booking.Commands.UpdateBooking
             }
 
             // Check if the new reader exists
-            var existingReader = await _readerRepository.FindAsync(x => x.ID == request.ReaderId && !x.DeletedDay.HasValue, cancellationToken);
+            var existingReader = await _readerRepository.FindAsync(x => x.User.ID == request.ReaderId && !x.DeletedDay.HasValue, cancellationToken);
             if (existingReader == null)
             {
                 throw new NotFoundException("Reader does not exist.");
