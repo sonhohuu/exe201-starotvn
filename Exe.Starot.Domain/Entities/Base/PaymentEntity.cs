@@ -10,7 +10,7 @@ namespace Exe.Starot.Domain.Entities.Base
         public required string ID { get; set; }
         [Column(TypeName = "decimal(18,4)")]
         public required decimal Amount { get; set; }
-        public required string TransactionId { get; set; }
+        //public required string TransactionId { get; set; }
         public required string Token { get; set; }
         public required DateTime PaymentDate { get; set; }
         public required string OrderID { get; set; }

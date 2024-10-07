@@ -216,7 +216,7 @@ namespace Exe.Starot.Infrastructure.Migrations
                     Status = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Total = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     OrderDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    PaymentStatus = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PaymentStatus = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -340,7 +340,6 @@ namespace Exe.Starot.Infrastructure.Migrations
                 {
                     ID = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Amount = table.Column<decimal>(type: "decimal(18,4)", nullable: false),
-                    TransactionId = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Token = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PaymentDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     OrderID = table.Column<string>(type: "nvarchar(36)", nullable: false),
@@ -444,19 +443,19 @@ namespace Exe.Starot.Infrastructure.Migrations
                 columns: new[] { "ID", "CreatedBy", "CreatedDate", "DateOfBirth", "DeletedBy", "DeletedDay", "Email", "FirstName", "Image", "LastName", "LastUpdated", "PasswordHash", "Phone", "RefreshToken", "RefreshTokenExpiryTime", "RefreshTokenIssuedAt", "Role", "UpdatedBy" },
                 values: new object[,]
                 {
-                    { "user1", null, new DateTime(2024, 10, 7, 8, 13, 49, 795, DateTimeKind.Utc).AddTicks(4891), new DateTime(1990, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "customer@gmail.com", "John", "", "Doe", new DateTime(2024, 10, 7, 8, 13, 49, 795, DateTimeKind.Utc).AddTicks(4891), "$2a$11$.UE.yjCrVXmrN.TZCTH8zuXOOBUDfok0uuC9/fleBpR/avx1/.HhS", "123456789", null, new DateTime(2024, 11, 6, 8, 13, 49, 926, DateTimeKind.Utc).AddTicks(9987), new DateTime(2024, 10, 7, 8, 13, 49, 926, DateTimeKind.Utc).AddTicks(9995), "Customer", null },
-                    { "user2", null, new DateTime(2024, 10, 7, 8, 13, 49, 927, DateTimeKind.Utc).AddTicks(78), new DateTime(1992, 2, 2, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "reader@gmail.com", "Jane", "", "Smith", new DateTime(2024, 10, 7, 8, 13, 49, 927, DateTimeKind.Utc).AddTicks(78), "$2a$11$wlIEd9njx1/ldlLXZn7zW.VSWNeIrxDT6x.1Bv5ipxNw2NASnCOZq", "987654321", null, new DateTime(2024, 11, 6, 8, 13, 50, 59, DateTimeKind.Utc).AddTicks(1000), new DateTime(2024, 10, 7, 8, 13, 50, 59, DateTimeKind.Utc).AddTicks(1010), "Reader", null }
+                    { "user1", null, new DateTime(2024, 10, 7, 18, 33, 16, 715, DateTimeKind.Utc).AddTicks(8251), new DateTime(1990, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "customer@gmail.com", "John", "", "Doe", new DateTime(2024, 10, 7, 18, 33, 16, 715, DateTimeKind.Utc).AddTicks(8251), "$2a$11$N/1gIJZJWlzE24wuHQeWG.VeDd8WX/TXPKBdNUKlKHfhZy79onWv.", "123456789", null, new DateTime(2024, 11, 6, 18, 33, 16, 850, DateTimeKind.Utc).AddTicks(6275), new DateTime(2024, 10, 7, 18, 33, 16, 850, DateTimeKind.Utc).AddTicks(6283), "Customer", null },
+                    { "user2", null, new DateTime(2024, 10, 7, 18, 33, 16, 850, DateTimeKind.Utc).AddTicks(6369), new DateTime(1992, 2, 2, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "reader@gmail.com", "Jane", "", "Smith", new DateTime(2024, 10, 7, 18, 33, 16, 850, DateTimeKind.Utc).AddTicks(6369), "$2a$11$a4LAuh2j7sCPCJMmhGj7qezDH0q54/BZ9YMSbuWZPTA7NGCMLjnJu", "987654321", null, new DateTime(2024, 11, 6, 18, 33, 16, 986, DateTimeKind.Utc).AddTicks(345), new DateTime(2024, 10, 7, 18, 33, 16, 986, DateTimeKind.Utc).AddTicks(353), "Reader", null }
                 });
 
             migrationBuilder.InsertData(
                 table: "Customers",
                 columns: new[] { "ID", "CreatedBy", "CreatedDate", "DeletedBy", "DeletedDay", "LastUpdated", "Membership", "UpdatedBy", "UserId" },
-                values: new object[] { "customer1", null, new DateTime(2024, 10, 7, 8, 13, 50, 59, DateTimeKind.Utc).AddTicks(1739), null, null, new DateTime(2024, 10, 7, 8, 13, 50, 59, DateTimeKind.Utc).AddTicks(1739), 0, null, "user1" });
+                values: new object[] { "customer1", null, new DateTime(2024, 10, 7, 18, 33, 16, 986, DateTimeKind.Utc).AddTicks(941), null, null, new DateTime(2024, 10, 7, 18, 33, 16, 986, DateTimeKind.Utc).AddTicks(941), 0, null, "user1" });
 
             migrationBuilder.InsertData(
                 table: "Readers",
                 columns: new[] { "ID", "CreatedBy", "CreatedDate", "DeletedBy", "DeletedDay", "Experience", "ExperienceYears", "Expertise", "Image", "Introduction", "LastUpdated", "LinkUrl", "Quote", "Rating", "UpdatedBy", "UserId" },
-                values: new object[] { "reader1", null, new DateTime(2024, 10, 7, 8, 13, 50, 59, DateTimeKind.Utc).AddTicks(1847), null, null, "Experienced in tarot reading, astrology, and palmistry.", 5, "", "default_image.png", "I am a seasoned reader with years of experience.", new DateTime(2024, 10, 7, 8, 13, 50, 59, DateTimeKind.Utc).AddTicks(1847), "http://johndoe.com", "I foresee great things!", 4.8m, null, "user2" });
+                values: new object[] { "reader1", null, new DateTime(2024, 10, 7, 18, 33, 16, 986, DateTimeKind.Utc).AddTicks(974), null, null, "Experienced in tarot reading, astrology, and palmistry.", 5, "", "default_image.png", "I am a seasoned reader with years of experience.", new DateTime(2024, 10, 7, 18, 33, 16, 986, DateTimeKind.Utc).AddTicks(974), "http://johndoe.com", "I foresee great things!", 4.8m, null, "user2" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Bookings_CustomerId",
