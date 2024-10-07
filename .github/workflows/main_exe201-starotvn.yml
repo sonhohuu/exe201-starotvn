@@ -35,7 +35,7 @@ jobs:
 
       # New step: Publish project
       - name: Publish project
-        run: dotnet publish ./Exe.StarotSolution.sln --configuration Release --output '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+        run: dotnet publish ./Exe.StarotSolution.sln --configuration Release --output '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}'
         
       # Upload artifact for deployment job
       - name: Upload artifact for deployment job
