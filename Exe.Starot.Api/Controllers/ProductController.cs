@@ -8,6 +8,8 @@ using Exe.Starot.Domain.Common.Exceptions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Mime;
+using Exe.Starot.Api.Attributes;
+using Exe.Starot.Api.Services;
 
 namespace Exe.Starot.Api.Controllers
 {
@@ -15,9 +17,11 @@ namespace Exe.Starot.Api.Controllers
     [Route("api/v1/products")]
     public class ProductController : ControllerBase
     {
+        private readonly IResponseCacheService _responseCacheService;
         private readonly ISender _mediator;
-        public ProductController(ISender mediator)
+        public ProductController(ISender mediator, IResponseCacheService responseCacheService)
         {
+            _responseCacheService = responseCacheService;
             _mediator = mediator;
         }
 
@@ -32,6 +36,7 @@ namespace Exe.Starot.Api.Controllers
             [FromForm] CreateProductCommand command,
             CancellationToken cancellationToken = default)
         {
+            await _responseCacheService.RemoveCacheResponseAsync("api/v1/products");
             try
             {
                 var result = await _mediator.Send(command, cancellationToken);
@@ -50,6 +55,7 @@ namespace Exe.Starot.Api.Controllers
 
         // GET: api/v1/products
         [HttpGet]
+        [Cache(10000)]
         [Produces(MediaTypeNames.Application.Json)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -79,6 +85,8 @@ namespace Exe.Starot.Api.Controllers
             [FromForm] UpdateProductCommand command,
             CancellationToken cancellationToken = default)
         {
+            await _responseCacheService.RemoveCacheResponseAsync("api/v1/products");       // GetAll cache
+           
             try
             {
                 var result = await _mediator.Send(command, cancellationToken);
@@ -109,6 +117,7 @@ namespace Exe.Starot.Api.Controllers
             [FromRoute] string id,
             CancellationToken cancellationToken = default)
         {
+            await _responseCacheService.RemoveCacheResponseAsync("api/v1/products");
             try
             {
                 var command = new DeleteProductCommand { Id = id };

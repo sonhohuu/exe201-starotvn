@@ -1,4 +1,6 @@
-﻿using Exe.Starot.Application.Common.Pagination;
+﻿using Exe.Starot.Api.Attributes;
+using Exe.Starot.Api.Services;
+using Exe.Starot.Application.Common.Pagination;
 using Exe.Starot.Application.TarotCard;
 using Exe.Starot.Application.TarotCard.Create;
 using Exe.Starot.Application.TarotCard.Delete;
@@ -16,11 +18,13 @@ namespace Exe.Starot.Api.Controllers
     [Route("api/v1/tarotcards")]
     public class TarotCardController : ControllerBase
     {
+        private readonly IResponseCacheService _responseCacheService;
         private readonly ISender _mediator;
 
-        public TarotCardController(ISender mediator)
+        public TarotCardController(ISender mediator, IResponseCacheService responseCacheService)
         {
             _mediator = mediator;
+            _responseCacheService = responseCacheService;
         }
 
         // POST: api/v1/tarotcards
@@ -34,11 +38,15 @@ namespace Exe.Starot.Api.Controllers
             [FromForm] CreateTarotCardCommand command,
             CancellationToken cancellationToken = default)
         {
+            await _responseCacheService.RemoveCacheResponseAsync("api/v1/tarotcards");       // GetAll cache
+            await _responseCacheService.RemoveCacheResponseAsync("api/v1/tarotcards/random"); // Random card cache
+
+
             try
             {
                 var result = await _mediator.Send(command, cancellationToken);
                 return CreatedAtAction(nameof(CreateTarotCard), new { id = result },
-                    new JsonResponse<string>(StatusCodes.Status201Created, result, ""));
+                    new JsonResponse<string>(StatusCodes.Status201Created, result, "Create "));
             }
             catch (DuplicationException ex)
             {
@@ -53,6 +61,7 @@ namespace Exe.Starot.Api.Controllers
 
         // GET: api/v1/tarotcards/random
         [HttpGet("random")]
+        [Cache(1000)]
         [Produces(MediaTypeNames.Application.Json)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -71,6 +80,7 @@ namespace Exe.Starot.Api.Controllers
 
         // GET: api/v1/tarotcards
         [HttpGet]
+        [Cache(1000)]
         [Produces(MediaTypeNames.Application.Json)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -100,6 +110,8 @@ namespace Exe.Starot.Api.Controllers
             [FromBody] UpdateCardCommand command,
             CancellationToken cancellationToken = default)
         {
+            await _responseCacheService.RemoveCacheResponseAsync("api/v1/tarotcards");       // GetAll cache
+            await _responseCacheService.RemoveCacheResponseAsync("api/v1/tarotcards/random"); // Random card cache
             if (command.Id <= 0)
             {
                 return BadRequest(new JsonResponse<string>(StatusCodes.Status400BadRequest, "Invalid ID provided.", ""));
@@ -135,6 +147,8 @@ namespace Exe.Starot.Api.Controllers
             [FromRoute] int id,
             CancellationToken cancellationToken = default)
         {
+            await _responseCacheService.RemoveCacheResponseAsync("api/v1/tarotcards");       // GetAll cache
+            await _responseCacheService.RemoveCacheResponseAsync("api/v1/tarotcards/random"); // Random card cache
             try
             {
                 var command = new DeleteTarotCardCommand { Id = id };

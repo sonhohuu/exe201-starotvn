@@ -6,5 +6,7 @@ namespace Exe.Starot.Api.Services
     {
         Task SetCacheResponseAsync(string cachekey, object response, TimeSpan timeOut);
         Task<string> GetCachedResponseAsync(string cacheKey);
+
+        Task RemoveCacheResponseAsync(string pattern);
     }
 }

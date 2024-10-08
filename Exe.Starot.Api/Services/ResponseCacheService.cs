@@ -15,29 +15,56 @@ namespace Exe.Starot.Api.Services
             _distributedCache = distributedCache;
             _connectionMultiplexer = connectionMultiplexer;
         }
-    
+
         public async Task<string> GetCachedResponseAsync(string cacheKey)
         {
             var cacheResponse = await _distributedCache.GetStringAsync(cacheKey);
             return string.IsNullOrEmpty(cacheResponse) ? null : cacheResponse;
         }
 
-        public async Task SetCacheResponseAsync(string cachekey, object response, TimeSpan timeOut)
+        public async Task RemoveCacheResponseAsync(string pattern)
+        {
+            if (string.IsNullOrWhiteSpace(pattern))
+                throw new ArgumentException("Value can not be null or whitespace");
+            await foreach(var key in GetKeyAsync(pattern + "*"))
+            {
+                await _distributedCache.RemoveAsync(key);
+            }
+
+        }
+        private async IAsyncEnumerable<string> GetKeyAsync(string pattern)
+        {
+            if (string.IsNullOrWhiteSpace(pattern))
+                throw new ArgumentException("Value can not be null or whitespace");
+
+            foreach (var endPoint in _connectionMultiplexer.GetEndPoints())
+            {
+                var server = _connectionMultiplexer.GetServer(endPoint);    
+                foreach(var key in server.Keys(pattern: pattern))
+                {
+                    yield return key.ToString();    
+                }
+            }
+        }
+
+        public async Task SetCacheResponseAsync(string cacheKey, object response, TimeSpan timeOut)
         {
             if (response == null)
             {
-                return;
-
-                var serializerResponse = JsonConvert.SerializeObject(response, new JsonSerializerSettings()
-                {
-                    ContractResolver = new CamelCasePropertyNamesContractResolver()
-
-                });
-                await _distributedCache.SetStringAsync(cachekey, serializerResponse, new DistributedCacheEntryOptions
-                {
-                    AbsoluteExpirationRelativeToNow = timeOut
-                });
+                return; // Skip caching if the response is null
             }
+
+            var serializerResponse = JsonConvert.SerializeObject(response, new JsonSerializerSettings()
+            {
+                ContractResolver = new CamelCasePropertyNamesContractResolver()
+            });
+
+            await _distributedCache.SetStringAsync(cacheKey, serializerResponse, new DistributedCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = timeOut
+            });
         }
+
+       
     }
 }
