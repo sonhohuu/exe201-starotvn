@@ -419,3 +419,4 @@ FodyWeavers.xsd
 1
 
 # Ignore appsettings.json
+appsettings.json
