@@ -35,18 +35,23 @@ namespace Exe.Starot.Api.Controllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> CreateTarotCard(
-            [FromForm] CreateTarotCardCommand command,
-            CancellationToken cancellationToken = default)
+    [FromForm] CreateTarotCardCommand command,
+    CancellationToken cancellationToken = default)
         {
-            await _responseCacheService.RemoveCacheResponseAsync("api/v1/tarotcards");       // GetAll cache
-            await _responseCacheService.RemoveCacheResponseAsync("api/v1/tarotcards/random"); // Random card cache
-
-
             try
             {
                 var result = await _mediator.Send(command, cancellationToken);
+
+                // Remove old cache
+                await _responseCacheService.RemoveCacheResponseAsync("api/v1/tarotcards"); // GetAll cache
+                await _responseCacheService.RemoveCacheResponseAsync("api/v1/tarotcards/random"); // Random card cache
+
+                // Fetch the latest data and update the cache
+                var updatedCards = await _mediator.Send(new FilterTarotCardQuery(), cancellationToken);
+                await _responseCacheService.SetCacheResponseAsync("api/v1/tarotcards", updatedCards, TimeSpan.FromMinutes(30));
+
                 return CreatedAtAction(nameof(CreateTarotCard), new { id = result },
-                    new JsonResponse<string>(StatusCodes.Status201Created, result, "Create "));
+                    new JsonResponse<string>(StatusCodes.Status201Created, result, "Create success!"));
             }
             catch (DuplicationException ex)
             {
@@ -58,6 +63,7 @@ namespace Exe.Starot.Api.Controllers
                     new JsonResponse<string>(StatusCodes.Status500InternalServerError, ex.Message, ""));
             }
         }
+
 
         // GET: api/v1/tarotcards/random
         [HttpGet("random")]
@@ -107,11 +113,9 @@ namespace Exe.Starot.Api.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> UpdateTarotCard(
-            [FromBody] UpdateCardCommand command,
-            CancellationToken cancellationToken = default)
+    [FromBody] UpdateCardCommand command,
+    CancellationToken cancellationToken = default)
         {
-            await _responseCacheService.RemoveCacheResponseAsync("api/v1/tarotcards");       // GetAll cache
-            await _responseCacheService.RemoveCacheResponseAsync("api/v1/tarotcards/random"); // Random card cache
             if (command.Id <= 0)
             {
                 return BadRequest(new JsonResponse<string>(StatusCodes.Status400BadRequest, "Invalid ID provided.", ""));
@@ -120,7 +124,16 @@ namespace Exe.Starot.Api.Controllers
             try
             {
                 var result = await _mediator.Send(command, cancellationToken);
-                return Ok(new JsonResponse<string>(StatusCodes.Status200OK, result, ""));
+
+                // Remove old cache
+                await _responseCacheService.RemoveCacheResponseAsync("api/v1/tarotcards"); // GetAll cache
+                await _responseCacheService.RemoveCacheResponseAsync("api/v1/tarotcards/random"); // Random card cache
+
+                // Fetch the latest data and update the cache
+                var updatedCards = await _mediator.Send(new FilterTarotCardQuery(), cancellationToken);
+                await _responseCacheService.SetCacheResponseAsync("api/v1/tarotcards", updatedCards, TimeSpan.FromMinutes(30));
+
+                return Ok(new JsonResponse<string>(StatusCodes.Status200OK, result, "Update success!"));
             }
             catch (NotFoundException ex)
             {
@@ -136,24 +149,33 @@ namespace Exe.Starot.Api.Controllers
             }
         }
 
+
         // DELETE: api/v1/tarotcards/{id}
         [HttpDelete("{id}")]
         [Produces(MediaTypeNames.Application.Json)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> DeleteTarotCard(
-            [FromRoute] int id,
-            CancellationToken cancellationToken = default)
+        public async Task<ActionResult> DeleteTarotCard(int id, CancellationToken cancellationToken = default)
         {
-            await _responseCacheService.RemoveCacheResponseAsync("api/v1/tarotcards");       // GetAll cache
-            await _responseCacheService.RemoveCacheResponseAsync("api/v1/tarotcards/random"); // Random card cache
+            if (id <= 0)
+            {
+                return BadRequest(new JsonResponse<string>(StatusCodes.Status400BadRequest, "Invalid ID provided.", ""));
+            }
+
             try
             {
-                var command = new DeleteTarotCardCommand { Id = id };
-                var result = await _mediator.Send(command, cancellationToken);
-                return Ok(new JsonResponse<string>(StatusCodes.Status200OK, result, ""));
+                var result = await _mediator.Send(new DeleteTarotCardCommand {Id = id }, cancellationToken);
+
+                // Remove old cache
+                await _responseCacheService.RemoveCacheResponseAsync("api/v1/tarotcards"); // GetAll cache
+                await _responseCacheService.RemoveCacheResponseAsync("api/v1/tarotcards/random"); // Random card cache
+
+                // Fetch the latest data and update the cache
+                var updatedCards = await _mediator.Send(new FilterTarotCardQuery(), cancellationToken);
+                await _responseCacheService.SetCacheResponseAsync("api/v1/tarotcards", updatedCards, TimeSpan.FromMinutes(30));
+
+                return Ok(new JsonResponse<string>(StatusCodes.Status200OK, result, "Delete success!"));
             }
             catch (NotFoundException ex)
             {
@@ -161,10 +183,10 @@ namespace Exe.Starot.Api.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    new JsonResponse<string>(StatusCodes.Status500InternalServerError, ex.Message, ""));
+                return StatusCode(StatusCodes.Status500InternalServerError, new JsonResponse<string>(StatusCodes.Status500InternalServerError, ex.Message, ""));
             }
         }
+
     }
 
 }
