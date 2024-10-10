@@ -1,7 +1,6 @@
 ﻿using Exe.Starot.Application.Common.Behaviours;
 using Exe.Starot.Application.Common.Validation;
 using Exe.Starot.Application.FileUpload;
-using Exe.Starot.Application.ZaloPay.Config;
 using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -30,7 +29,6 @@ namespace Exe.Starot.Application
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
             services.AddScoped<IValidatorProvider, ValidatorProvider>();
             services.AddTransient<FileUploadService>();
-            services.Configure<ZaloPayConfig>(configuration.GetSection(ZaloPayConfig.ConfigName));
 
 
             return services;

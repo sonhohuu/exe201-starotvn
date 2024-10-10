@@ -54,7 +54,7 @@ namespace Exe.Starot.Application.Customer.Queries.Filter
 
             if (request.DateOfBirth.HasValue)
             {
-                customers = customers.Where(c => c.User.DateOfBirth == request.DateOfBirth).ToList();
+                customers = customers.Where(c => c.User.DateOfBirth == request.DateOfBirth?.ToString("dd/MM/yyyy")).ToList();
             }
 
             // If no records are found, return an empty paged result

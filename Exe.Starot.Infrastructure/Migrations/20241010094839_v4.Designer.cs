@@ -4,6 +4,7 @@ using Exe.Starot.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Exe.Starot.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241010094839_v4")]
+    partial class v4
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -176,8 +179,8 @@ namespace Exe.Starot.Infrastructure.Migrations
                         new
                         {
                             ID = "customer1",
-                            CreatedDate = new DateTime(2024, 10, 10, 10, 42, 27, 382, DateTimeKind.Utc).AddTicks(4846),
-                            LastUpdated = new DateTime(2024, 10, 10, 10, 42, 27, 382, DateTimeKind.Utc).AddTicks(4846),
+                            CreatedDate = new DateTime(2024, 10, 10, 9, 48, 39, 552, DateTimeKind.Utc).AddTicks(1532),
+                            LastUpdated = new DateTime(2024, 10, 10, 9, 48, 39, 552, DateTimeKind.Utc).AddTicks(1532),
                             Membership = 0,
                             UserId = "user1"
                         });
@@ -581,13 +584,13 @@ namespace Exe.Starot.Infrastructure.Migrations
                         new
                         {
                             ID = "reader1",
-                            CreatedDate = new DateTime(2024, 10, 10, 10, 42, 27, 382, DateTimeKind.Utc).AddTicks(4890),
+                            CreatedDate = new DateTime(2024, 10, 10, 9, 48, 39, 552, DateTimeKind.Utc).AddTicks(1599),
                             Experience = "Experienced in tarot reading, astrology, and palmistry.",
                             ExperienceYears = 5,
                             Expertise = "",
                             Image = "default_image.png",
                             Introduction = "I am a seasoned reader with years of experience.",
-                            LastUpdated = new DateTime(2024, 10, 10, 10, 42, 27, 382, DateTimeKind.Utc).AddTicks(4890),
+                            LastUpdated = new DateTime(2024, 10, 10, 9, 48, 39, 552, DateTimeKind.Utc).AddTicks(1599),
                             LinkUrl = "http://johndoe.com",
                             Quote = "I foresee great things!",
                             Rating = 4.8m,
@@ -704,8 +707,8 @@ namespace Exe.Starot.Infrastructure.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("DateOfBirth")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime?>("DateOfBirth")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("DeletedBy")
                         .HasColumnType("nvarchar(max)");
@@ -770,55 +773,37 @@ namespace Exe.Starot.Infrastructure.Migrations
                         {
                             ID = "user1",
                             Balance = 0m,
-                            CreatedDate = new DateTime(2024, 10, 10, 10, 42, 26, 926, DateTimeKind.Utc).AddTicks(8849),
-                            DateOfBirth = "20/11/2020",
+                            CreatedDate = new DateTime(2024, 10, 10, 9, 48, 39, 227, DateTimeKind.Utc).AddTicks(3055),
+                            DateOfBirth = new DateTime(1990, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "customer@gmail.com",
                             FirstName = "John",
                             Gender = "Female",
                             Image = "",
                             LastName = "Doe",
-                            LastUpdated = new DateTime(2024, 10, 10, 10, 42, 26, 926, DateTimeKind.Utc).AddTicks(8849),
-                            PasswordHash = "$2a$11$w7uDIPRRjJCFBTOuu29mAOq5SnC8Gis9DWGzphUJ8WRnVCIc175oy",
+                            LastUpdated = new DateTime(2024, 10, 10, 9, 48, 39, 227, DateTimeKind.Utc).AddTicks(3055),
+                            PasswordHash = "$2a$11$tpFKpb.V7QbUxrBzCf4OxOBTwuXB4v6nQTLMwM2ihW5vrQI.77D8e",
                             Phone = "123456789",
-                            RefreshTokenExpiryTime = new DateTime(2024, 11, 9, 10, 42, 27, 77, DateTimeKind.Utc).AddTicks(6933),
-                            RefreshTokenIssuedAt = new DateTime(2024, 10, 10, 10, 42, 27, 77, DateTimeKind.Utc).AddTicks(6944),
+                            RefreshTokenExpiryTime = new DateTime(2024, 11, 9, 9, 48, 39, 395, DateTimeKind.Utc).AddTicks(2792),
+                            RefreshTokenIssuedAt = new DateTime(2024, 10, 10, 9, 48, 39, 395, DateTimeKind.Utc).AddTicks(2805),
                             Role = "Customer"
                         },
                         new
                         {
                             ID = "user2",
                             Balance = 0m,
-                            CreatedDate = new DateTime(2024, 10, 10, 10, 42, 27, 77, DateTimeKind.Utc).AddTicks(7061),
-                            DateOfBirth = "20/11/2020",
+                            CreatedDate = new DateTime(2024, 10, 10, 9, 48, 39, 395, DateTimeKind.Utc).AddTicks(2926),
+                            DateOfBirth = new DateTime(1992, 2, 2, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "reader@gmail.com",
                             FirstName = "Jane",
                             Gender = "Male",
                             Image = "",
                             LastName = "Smith",
-                            LastUpdated = new DateTime(2024, 10, 10, 10, 42, 27, 77, DateTimeKind.Utc).AddTicks(7061),
-                            PasswordHash = "$2a$11$uad2ka6RWYbMtK4absKP0OKp4TQf8GfoqPZHW5Xp/FZMK4D.3Yc8u",
+                            LastUpdated = new DateTime(2024, 10, 10, 9, 48, 39, 395, DateTimeKind.Utc).AddTicks(2926),
+                            PasswordHash = "$2a$11$iqAxb9sns9Ns6UH9n7q7K.40VpJlng0tgb7nfrfTUqz//uhC7vHoa",
                             Phone = "987654321",
-                            RefreshTokenExpiryTime = new DateTime(2024, 11, 9, 10, 42, 27, 228, DateTimeKind.Utc).AddTicks(5157),
-                            RefreshTokenIssuedAt = new DateTime(2024, 10, 10, 10, 42, 27, 228, DateTimeKind.Utc).AddTicks(5176),
+                            RefreshTokenExpiryTime = new DateTime(2024, 11, 9, 9, 48, 39, 552, DateTimeKind.Utc).AddTicks(363),
+                            RefreshTokenIssuedAt = new DateTime(2024, 10, 10, 9, 48, 39, 552, DateTimeKind.Utc).AddTicks(381),
                             Role = "Reader"
-                        },
-                        new
-                        {
-                            ID = "admin",
-                            Balance = 0m,
-                            CreatedDate = new DateTime(2024, 10, 10, 10, 42, 27, 228, DateTimeKind.Utc).AddTicks(5274),
-                            DateOfBirth = "20/11/2020",
-                            Email = "admin@gmail.com",
-                            FirstName = "Test",
-                            Gender = "Female",
-                            Image = "",
-                            LastName = "Admin",
-                            LastUpdated = new DateTime(2024, 10, 10, 10, 42, 27, 228, DateTimeKind.Utc).AddTicks(5274),
-                            PasswordHash = "$2a$11$BtAK4YCTxHMYN9LsQtW9FO.yeXKOv5wmmNSkd5vgQz/pXADP3qM6u",
-                            Phone = "123456789",
-                            RefreshTokenExpiryTime = new DateTime(2024, 11, 9, 10, 42, 27, 382, DateTimeKind.Utc).AddTicks(3900),
-                            RefreshTokenIssuedAt = new DateTime(2024, 10, 10, 10, 42, 27, 382, DateTimeKind.Utc).AddTicks(3914),
-                            Role = "Admin"
                         });
                 });
 

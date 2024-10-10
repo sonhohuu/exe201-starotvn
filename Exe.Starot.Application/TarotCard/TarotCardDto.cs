@@ -16,7 +16,7 @@ namespace Exe.Starot.Application.TarotCard
         public int ID { get; set; }            // The ID of the card
         public string Name { get; set; }        // The name of the card
         public string Content { get; set; }     // Content or description of the card
-        public string Url { get; set; }       // Image URL or path for the card
+        public string Image { get; set; }       // Image URL or path for the card
         public string Type { get; set; }        // Type (e.g., Major or Minor Arcana)
 
         public void Mapping(Profile profile)

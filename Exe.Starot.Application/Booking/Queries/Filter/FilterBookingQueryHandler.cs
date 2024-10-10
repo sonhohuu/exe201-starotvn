@@ -15,7 +15,7 @@ namespace Exe.Starot.Application.Booking.Queries.Filter
         public string? CustomerId { get; set; }
         public string? ReaderId { get; set; }
         public string? Status { get; set; }
-        public DateTime? StartDate { get; set; }
+        public DateTime? Date { get; set; }
         public int PageNumber { get; set; } = 1;
         public int PageSize { get; set; } = 10;
     }
@@ -52,9 +52,9 @@ namespace Exe.Starot.Application.Booking.Queries.Filter
                 bookings = bookings.Where(b => b.Status.ToLower().Contains(request.Status.ToLower())).ToList();
             }
 
-            if (request.StartDate.HasValue)
+            if (request.Date.HasValue)
             {
-                bookings = bookings.Where(b => b.StartDate.Date == request.StartDate.Value.Date).ToList();
+                bookings = bookings.Where(b => b.Date == request.Date?.ToString("dd/MM/yyyy")).ToList();
             }
 
             // If no bookings are found, return an empty list

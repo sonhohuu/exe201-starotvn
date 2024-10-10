@@ -19,10 +19,12 @@ namespace Exe.Starot.Application.Product
         public string Content { get; set; }
         public string Description { get; set; }
         public string Image { get; set; }
+        public int PurchaseCount { get; set; }
         public void Mapping(Profile profile)
         {
 
-            profile.CreateMap<ProductEntity, ProductDto>();
+            profile.CreateMap<ProductEntity, ProductDto>()
+               .ForMember(dest => dest.PurchaseCount, opt => opt.Ignore());
         }
     }
 }

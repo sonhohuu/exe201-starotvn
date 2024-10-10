@@ -19,6 +19,12 @@ namespace Exe.Starot.Application.Customer.Commands.UpdateCustomer
                 .When(x => !string.IsNullOrEmpty(x.FirstName))
                 .WithMessage("First Name cannot exceed 255 characters.");
 
+            RuleFor(x => x.Gender)
+                .Must(gender => string.IsNullOrEmpty(gender) ||
+                    gender.Equals("Female", StringComparison.OrdinalIgnoreCase) ||
+                    gender.Equals("Male", StringComparison.OrdinalIgnoreCase))
+                .WithMessage("Gender must be either 'Female', 'Male', or left empty.");
+
             // LastName validation
             RuleFor(x => x.LastName)
                 .MaximumLength(100)

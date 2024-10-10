@@ -19,9 +19,11 @@ namespace Exe.Starot.Domain.Entities.Base
         public string? Email { get; set; }
         public string? PasswordHash { get; set; }
         public string? Role { get; set; }
+        public decimal Balance { get; set; } = 0;
         public string Phone { get; set; } = string.Empty;
-        public DateTime? DateOfBirth { get; set; }
+        public string? DateOfBirth { get; set; }
         public string Image { get; set; } = string.Empty;
+        public string Gender {  get; set; } = string.Empty;
 
         public virtual ICollection<OrderEntity> Orders { get; set; }
         public virtual ICollection<FavoriteProductEntity> FavoriteProducts { get; set; }

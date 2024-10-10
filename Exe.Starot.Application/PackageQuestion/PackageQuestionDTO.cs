@@ -11,14 +11,17 @@ namespace Exe.Starot.Application.PackageQuestion
 {
     public class PackageQuestionDTO : IMapFrom<PackageQuestionEntity>
     {
+        public int Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public decimal Price { get; set; }
         public string Image { get; set; } // Assuming that storing the image URL in the database.
         public int Time { get; set; }
+        public int BookingCount { get; set; }
         public void Mapping(Profile profile)
         {
-            profile.CreateMap<PackageQuestionEntity, PackageQuestionDTO>();
+            profile.CreateMap<PackageQuestionEntity, PackageQuestionDTO>()
+                .ForMember(dest => dest.BookingCount, opt => opt.Ignore());
         }
     }
 }

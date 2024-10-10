@@ -53,10 +53,11 @@ namespace Exe.Starot.Infrastructure.Persistence
                     FirstName = "John",
                     LastName = "Doe",
                     Email = "customer@gmail.com",
-                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("123456"),
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("string"),
                     Role = "Customer",
                     Phone = "123456789",
-                    DateOfBirth = new DateTime(1990, 1, 1),
+                    Gender = "Female",
+                    DateOfBirth = "20/11/2020",
                     RefreshToken = null,
                     RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(30),
                     RefreshTokenIssuedAt = DateTime.UtcNow
@@ -67,10 +68,26 @@ namespace Exe.Starot.Infrastructure.Persistence
                     FirstName = "Jane",
                     LastName = "Smith",
                     Email = "reader@gmail.com",
-                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("123456"),
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("string"),
                     Role = "Reader",
                     Phone = "987654321",
-                    DateOfBirth = new DateTime(1992, 2, 2),
+                    Gender = "Male",
+                    DateOfBirth = "20/11/2020",
+                    RefreshToken = null,
+                    RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(30),
+                    RefreshTokenIssuedAt = DateTime.UtcNow
+                },
+                new UserEntity
+                {
+                    ID = "admin",  // Replace with actual ID structure
+                    FirstName = "Test",
+                    LastName = "Admin",
+                    Email = "admin@gmail.com",
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("string"),
+                    Role = "Admin",
+                    Phone = "123456789",
+                    Gender = "Female",
+                    DateOfBirth = "20/11/2020",
                     RefreshToken = null,
                     RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(30),
                     RefreshTokenIssuedAt = DateTime.UtcNow

@@ -20,6 +20,7 @@ namespace Exe.Starot.Application.Reader.Commands.UpdateReader
         public string? Phone { get; init; }
         public DateTime? DateOfBirth { get; init; }
         public string? Expertise { get; init; }
+        public string? Gender { get; init; }
         public string? Quote { get; init; }
         public string? Experience { get; init; }
         public decimal? Rating { get; init; }
@@ -62,12 +63,13 @@ namespace Exe.Starot.Application.Reader.Commands.UpdateReader
             if (!string.IsNullOrEmpty(request.FirstName)) user.FirstName = request.FirstName;
             if (!string.IsNullOrEmpty(request.LastName)) user.LastName = request.LastName;
             if (!string.IsNullOrEmpty(request.Phone)) user.Phone = request.Phone;
-            if (request.DateOfBirth.HasValue) user.DateOfBirth = request.DateOfBirth.Value;
+            if (request.DateOfBirth.HasValue) user.DateOfBirth = request.DateOfBirth?.ToString("dd/MM/yyyy");
             if (!string.IsNullOrEmpty(request.Expertise)) reader.Expertise = request.Expertise;
             if (!string.IsNullOrEmpty(request.Quote)) reader.Quote = request.Quote;
             if (!string.IsNullOrEmpty(request.Experience)) reader.Experience = request.Experience;
             if (request.Rating.HasValue) reader.Rating = request.Rating.Value;
             if (!string.IsNullOrEmpty(request.LinkUrl)) reader.LinkUrl = request.LinkUrl;
+            if (!string.IsNullOrEmpty(request.Gender)) user.Gender = CapitalizeFirstLetter(request.Gender.ToLower());
 
             // Handle image upload if a new image is provided
             if (request.Image != null)
@@ -88,6 +90,14 @@ namespace Exe.Starot.Application.Reader.Commands.UpdateReader
             _readerRepository.Update(reader);
             _userRepository.Update(user);
             return await _userRepository.UnitOfWork.SaveChangesAsync(cancellationToken) > 0 ? "Update Successfully!" : "Update Failed!";
+        }
+
+        public string CapitalizeFirstLetter(string input)
+        {
+            if (string.IsNullOrEmpty(input))
+                return input;
+
+            return char.ToUpper(input[0]) + input.Substring(1);
         }
     }
 

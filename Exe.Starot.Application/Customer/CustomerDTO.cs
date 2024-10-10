@@ -14,12 +14,13 @@ namespace Exe.Starot.Application.Customer
     public class CustomerDTO : IMapFrom<CustomerEntity>
     {
         public string CustomerId { get; set; }
-        public string? FirstName { get; init; }
-        public string? LastName { get; init; }
-        public string? Image { get; init; }
-        public string? Phone { get; init; }
-        public DateTime? DateOfBirth { get; init; }
-        public int MemberShip { get; init; } = 0;
+        public string? FirstName { get; set; }
+        public string? LastName { get; set; }
+        public string? Image { get; set; }
+        public string? Phone { get; set; }
+        public string? Gender { get; set; }
+        public string? DateOfBirth { get; set; }
+        public int MemberShip { get; set; } = 0;
 
         public void Mapping(Profile profile)
         {

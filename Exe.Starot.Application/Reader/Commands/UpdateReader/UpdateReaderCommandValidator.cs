@@ -19,6 +19,12 @@ namespace Exe.Starot.Application.Reader.Commands.UpdateReader
                 .When(x => !string.IsNullOrEmpty(x.FirstName))
                 .WithMessage("First name cannot exceed 100 characters.");
 
+            RuleFor(x => x.Gender)
+                .Must(gender => string.IsNullOrEmpty(gender) ||
+                    gender.Equals("Female", StringComparison.OrdinalIgnoreCase) ||
+                    gender.Equals("Male", StringComparison.OrdinalIgnoreCase))
+                .WithMessage("Gender must be either 'Female', 'Male', or left empty.");
+
             // Validate LastName (if provided)
             RuleFor(x => x.LastName)
                 .MaximumLength(100)

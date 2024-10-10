@@ -4,6 +4,7 @@ using Exe.Starot.Application;
 using Exe.Starot.Application.FileUpload;
 using Exe.Starot.Application.Order;
 using Exe.Starot.Infrastructure;
+using Net.payOS;
 using Serilog;
 
 namespace Exe.Starot.Api
@@ -57,6 +58,16 @@ namespace Exe.Starot.Api
             {
                 throw new ArgumentNullException(nameof(firebaseConfig), "FirebaseConfig section is missing in configuration.");
             }
+
+            services.AddSingleton<PayOS>(provider =>
+            {
+                string clientId = Configuration["PaymentEnvironment:PAYOS_CLIENT_ID"] ?? throw new Exception("Cannot find PAYOS_CLIENT_ID");
+                string apiKey = Configuration["PaymentEnvironment:PAYOS_API_KEY"] ?? throw new Exception("Cannot find PAYOS_API_KEY");
+                string checksumKey = Configuration["PaymentEnvironment:PAYOS_CHECKSUM_KEY"] ?? throw new Exception("Cannot find PAYOS_CHECKSUM_KEY");
+
+                return new PayOS(clientId, apiKey, checksumKey);
+
+            });
 
             services.AddSingleton(firebaseConfig);
             services.AddSingleton<FileUploadService>();

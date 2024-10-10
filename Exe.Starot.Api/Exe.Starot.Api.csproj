@@ -24,6 +24,7 @@
     </PackageReference>
     <PackageReference Include="Microsoft.OpenApi" Version="1.6.21" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.19.6" />
+    <PackageReference Include="payOS" Version="1.0.7" />
     <PackageReference Include="Serilog.AspNetCore" Version="8.0.2" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.7.3" />
 	<Content Remove="web.config" />

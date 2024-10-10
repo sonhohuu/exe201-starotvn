@@ -58,7 +58,7 @@ namespace Exe.Starot.Api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> FiltereCustomer(
+        public async Task<ActionResult> FilterCustomer(
             [FromQuery] FilterCustomerQuery query,
             CancellationToken cancellationToken = default)
         {
