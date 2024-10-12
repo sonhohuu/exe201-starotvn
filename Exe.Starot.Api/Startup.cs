@@ -1,5 +1,6 @@
 ﻿using Exe.Starot.Api.Configuration;
 using Exe.Starot.Api.Filters;
+using Exe.Starot.Api.Installer;
 using Exe.Starot.Application;
 using Exe.Starot.Application.FileUpload;
 using Exe.Starot.Application.Order;
@@ -42,6 +43,7 @@ namespace Exe.Starot.Api
                         .AllowAnyMethod()
                         .AllowCredentials());
             });
+            
 
             // Register System.Text.Encoding
             System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
