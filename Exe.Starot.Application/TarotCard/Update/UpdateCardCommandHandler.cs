@@ -45,13 +45,25 @@ namespace Exe.Starot.Application.TarotCard.Update
                     imageUrl = await _fileUploadService.UploadFileAsync(stream, $"{Guid.NewGuid()}.jpg");
                 }
             }
-            existTarotCard.Name = request.Name;
-            existTarotCard.Content = request.Content;
-            existTarotCard.Type = request.Type;
+            if (!string.IsNullOrEmpty(request.Name))
+            {
+                existTarotCard.Name = request.Name;
+            }
+
+            if (!string.IsNullOrEmpty(request.Content))
+            {
+                existTarotCard.Content = request.Content;
+            }
+
+            if (!string.IsNullOrEmpty(request.Type))
+            {
+                existTarotCard.Type = request.Type;
+            }
+
             existTarotCard.Image = !string.IsNullOrEmpty(imageUrl) ? imageUrl : existTarotCard.Image;
             existTarotCard.UpdatedBy = _currentUserService.UserId;
             existTarotCard.UpdatedDay = DateTime.Now;
-           
+
             _repository.Update(existTarotCard);
             if(await _repository.UnitOfWork.SaveChangesAsync() > 0)
             {
