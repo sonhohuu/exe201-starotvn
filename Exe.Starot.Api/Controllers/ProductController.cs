@@ -8,6 +8,8 @@ using Exe.Starot.Domain.Common.Exceptions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Mime;
+using Exe.Starot.Api.Attributes;
+using Exe.Starot.Api.Services;
 
 namespace Exe.Starot.Api.Controllers
 {
@@ -15,9 +17,11 @@ namespace Exe.Starot.Api.Controllers
     [Route("api/v1/products")]
     public class ProductController : ControllerBase
     {
+        private readonly IResponseCacheService _responseCacheService;
         private readonly ISender _mediator;
-        public ProductController(ISender mediator)
+        public ProductController(ISender mediator, IResponseCacheService responseCacheService)
         {
+            _responseCacheService = responseCacheService;
             _mediator = mediator;
         }
 
@@ -29,14 +33,22 @@ namespace Exe.Starot.Api.Controllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> CreateProduct(
-            [FromForm] CreateProductCommand command,
-            CancellationToken cancellationToken = default)
+    [FromForm] CreateProductCommand command,
+    CancellationToken cancellationToken = default)
         {
             try
             {
                 var result = await _mediator.Send(command, cancellationToken);
+
+                // Remove old cache
+                await _responseCacheService.RemoveCacheResponseAsync("api/v1/products"); // Invalidate the cache for GetAll products
+
+                // Fetch updated product data and cache it
+                var updatedProducts = await _mediator.Send(new FilterProductQuery(), cancellationToken);
+                await _responseCacheService.SetCacheResponseAsync("api/v1/products", updatedProducts, TimeSpan.FromMinutes(30)); // Set new cache with updated products
+
                 return CreatedAtAction(nameof(CreateProduct), new { id = result },
-                    new JsonResponse<string>(StatusCodes.Status201Created, result, ""));
+                    new JsonResponse<string>(StatusCodes.Status201Created, result, "Create success!"));
             }
             catch (DuplicationException ex)
             {
@@ -44,12 +56,15 @@ namespace Exe.Starot.Api.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new JsonResponse<string>(StatusCodes.Status500InternalServerError, ex.Message, ""));
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new JsonResponse<string>(StatusCodes.Status500InternalServerError, ex.Message, ""));
             }
         }
 
+
         // GET: api/v1/products
         [HttpGet]
+        [Cache(10000)]
         [Produces(MediaTypeNames.Application.Json)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -76,13 +91,20 @@ namespace Exe.Starot.Api.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> UpdateProduct(
-            [FromForm] UpdateProductCommand command,
-            CancellationToken cancellationToken = default)
+    [FromForm] UpdateProductCommand command,
+    CancellationToken cancellationToken = default)
         {
+            await _responseCacheService.RemoveCacheResponseAsync("api/v1/products"); // Invalidate the cache for GetAll products
+
             try
             {
                 var result = await _mediator.Send(command, cancellationToken);
-                return Ok(new JsonResponse<string>(StatusCodes.Status200OK, result, ""));
+
+                // Fetch updated product data and cache it
+                var updatedProducts = await _mediator.Send(new FilterProductQuery(), cancellationToken);
+                await _responseCacheService.SetCacheResponseAsync("api/v1/products", updatedProducts, TimeSpan.FromMinutes(30)); // Set new cache with updated products
+
+                return Ok(new JsonResponse<string>(StatusCodes.Status200OK, result, "Update success!"));
             }
             catch (NotFoundException ex)
             {
@@ -106,14 +128,21 @@ namespace Exe.Starot.Api.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> DeleteProduct(
-            [FromRoute] string id,
-            CancellationToken cancellationToken = default)
+      [FromRoute] string id,
+      CancellationToken cancellationToken = default)
         {
+            await _responseCacheService.RemoveCacheResponseAsync("api/v1/products"); // Invalidate the cache for GetAll products
+
             try
             {
                 var command = new DeleteProductCommand { Id = id };
                 var result = await _mediator.Send(command, cancellationToken);
-                return Ok(new JsonResponse<string>(StatusCodes.Status200OK, result, ""));
+
+                // Fetch updated product data and cache it
+                var updatedProducts = await _mediator.Send(new FilterProductQuery(), cancellationToken);
+                await _responseCacheService.SetCacheResponseAsync("api/v1/products", updatedProducts, TimeSpan.FromMinutes(30)); // Set new cache with updated products
+
+                return Ok(new JsonResponse<string>(StatusCodes.Status200OK, result, "Delete success!"));
             }
             catch (NotFoundException ex)
             {

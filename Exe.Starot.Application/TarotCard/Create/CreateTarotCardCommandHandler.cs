@@ -55,6 +55,7 @@ namespace Exe.Starot.Application.TarotCard.Create
                 CreatedDate = DateTime.Now
             };
 
+
             // 4. Save the new Tarot card to the repository
           _repository.Add (newTarotCard);
             return await _repository.UnitOfWork.SaveChangesAsync(cancellationToken) > 0 ? "Create Success!" : "Create Fail!";
