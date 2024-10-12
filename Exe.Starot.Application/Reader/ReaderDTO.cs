@@ -14,17 +14,18 @@ namespace Exe.Starot.Application.Reader
     public class ReaderDTO : IMapFrom<ReaderEntity>
     {
         public string ReaderId { get; set; }
-        public string? FirstName { get; init; }
-        public string? LastName { get; init; }
-        public string? Image { get; init; }
-        public string? Phone { get; init; }
-        public DateTime? DateOfBirth { get; init; }
-        public int MemberShip { get; init; } = 0;
-        public string? Expertise { get; init; }
-        public string? Quote { get; init; }
-        public string? Experience { get; init; }
-        public decimal? Rating { get; init; }
-        public string? LinkUrl { get; init; }
+        public string? FirstName { get; set; }
+        public string? LastName { get; set; }
+        public string? Image { get; set; }
+        public string? Phone { get; set; }
+        public string? Gender { get; set; }
+        public DateTime? DateOfBirth { get; set; }
+        public int MemberShip { get; set; } = 0;
+        public string? Expertise { get; set; }
+        public string? Quote { get; set; }
+        public string? Experience { get; set; }
+        public decimal? Rating { get; set; }
+        public string? LinkUrl { get; set; }
 
         public void Mapping(Profile profile)
         {
@@ -34,6 +35,7 @@ namespace Exe.Starot.Application.Reader
                 .ForMember(dto => dto.LastName, opt => opt.MapFrom(entity => entity.User.LastName))
                 .ForMember(dto => dto.Image, opt => opt.MapFrom(entity => entity.User.Image))
                 .ForMember(dto => dto.Phone, opt => opt.MapFrom(entity => entity.User.Phone))
+                .ForMember(dto => dto.Gender, opt => opt.MapFrom(entity => entity.User.Gender))
                 .ForMember(dto => dto.DateOfBirth, opt => opt.MapFrom(entity => entity.User.DateOfBirth));
                 
         }

@@ -39,15 +39,20 @@ namespace Exe.Starot.Application.Product.Update
                 {
                     imageUrl = await _fileUploadService.UploadFileAsync(stream, $"{Guid.NewGuid()}.jpg");
                 }
+                productExist.Image = imageUrl;
             }
 
             productExist.Name = request.Name ?? productExist.Name;
             productExist.Code = request.Code ?? productExist.Code;
             productExist.Description = request.Description ?? productExist.Description;
             productExist.Content = request.Content ?? productExist.Content;
-            productExist.Price = request.Price ?? productExist.Price;
+            if (request.Price.HasValue && request.Price.Value > 0)
+            {
+                productExist.Price = request.Price.Value;
+            }
+
             productExist.UpdatedBy = _currentUserService.UserId;
-            productExist.LastUpdated = DateTime.Now;
+            productExist.LastUpdated = DateTime.UtcNow;
             _repository.Update(productExist);
             if (await _repository.UnitOfWork.SaveChangesAsync(cancellationToken) > 0)
             {

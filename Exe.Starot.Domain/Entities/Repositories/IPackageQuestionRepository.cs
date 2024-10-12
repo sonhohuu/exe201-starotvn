@@ -9,5 +9,6 @@ namespace Exe.Starot.Domain.Entities.Repositories
 {
     public interface  IPackageQuestionRepository : IEFRepository<PackageQuestionEntity,PackageQuestionEntity>
     {
+        Task<Dictionary<int, int>> GetBookingCountsForPackages(List<int> packageIds, CancellationToken cancellationToken);
     }
 }

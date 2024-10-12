@@ -4,6 +4,8 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using static Google.Apis.Requests.BatchRequest;
 using System.Net.Mime;
+using Exe.Starot.Application.Booking.Commands.DeleteBooking;
+using Exe.Starot.Domain.Common.Exceptions;
 
 namespace Exe.Starot.Api.Controllers
 {
@@ -30,8 +32,19 @@ namespace Exe.Starot.Api.Controllers
           [FromBody] CreateOrderCommand command,
           CancellationToken cancellationToken = default)
         {
-            var result = await _mediator.Send(command, cancellationToken);
-            return Ok(new JsonResponse<OrderDTO>(StatusCodes.Status200OK, "Create Order Success" , result));
+            try
+            {
+                var result = await _mediator.Send(command, cancellationToken);
+                return Ok(new JsonResponse<OrderDTO>(StatusCodes.Status200OK, "Create Order Success", result));
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new JsonResponse<string>(StatusCodes.Status404NotFound, ex.Message, ""));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new JsonResponse<string>(StatusCodes.Status500InternalServerError, ex.Message, ""));
+            }
         }
     }
 }

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Exe.Starot.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241007081351_v1")]
-    partial class v1
+    [Migration("20241009183356_v2")]
+    partial class v2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -177,8 +177,8 @@ namespace Exe.Starot.Infrastructure.Migrations
                         new
                         {
                             ID = "customer1",
-                            CreatedDate = new DateTime(2024, 10, 7, 8, 13, 50, 59, DateTimeKind.Utc).AddTicks(1739),
-                            LastUpdated = new DateTime(2024, 10, 7, 8, 13, 50, 59, DateTimeKind.Utc).AddTicks(1739),
+                            CreatedDate = new DateTime(2024, 10, 9, 18, 33, 55, 414, DateTimeKind.Utc).AddTicks(6896),
+                            LastUpdated = new DateTime(2024, 10, 9, 18, 33, 55, 414, DateTimeKind.Utc).AddTicks(6896),
                             Membership = 0,
                             UserId = "user1"
                         });
@@ -410,10 +410,6 @@ namespace Exe.Starot.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("TransactionId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("ID");
 
                     b.HasIndex("OrderID");
@@ -586,13 +582,13 @@ namespace Exe.Starot.Infrastructure.Migrations
                         new
                         {
                             ID = "reader1",
-                            CreatedDate = new DateTime(2024, 10, 7, 8, 13, 50, 59, DateTimeKind.Utc).AddTicks(1847),
+                            CreatedDate = new DateTime(2024, 10, 9, 18, 33, 55, 414, DateTimeKind.Utc).AddTicks(6962),
                             Experience = "Experienced in tarot reading, astrology, and palmistry.",
                             ExperienceYears = 5,
                             Expertise = "",
                             Image = "default_image.png",
                             Introduction = "I am a seasoned reader with years of experience.",
-                            LastUpdated = new DateTime(2024, 10, 7, 8, 13, 50, 59, DateTimeKind.Utc).AddTicks(1847),
+                            LastUpdated = new DateTime(2024, 10, 9, 18, 33, 55, 414, DateTimeKind.Utc).AddTicks(6962),
                             LinkUrl = "http://johndoe.com",
                             Quote = "I foresee great things!",
                             Rating = 4.8m,
@@ -700,6 +696,9 @@ namespace Exe.Starot.Infrastructure.Migrations
                         .HasMaxLength(36)
                         .HasColumnType("nvarchar(36)");
 
+                    b.Property<decimal>("Balance")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -723,6 +722,10 @@ namespace Exe.Starot.Infrastructure.Migrations
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("Gender")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Image")
                         .IsRequired()
@@ -767,33 +770,37 @@ namespace Exe.Starot.Infrastructure.Migrations
                         new
                         {
                             ID = "user1",
-                            CreatedDate = new DateTime(2024, 10, 7, 8, 13, 49, 795, DateTimeKind.Utc).AddTicks(4891),
+                            Balance = 0m,
+                            CreatedDate = new DateTime(2024, 10, 9, 18, 33, 55, 108, DateTimeKind.Utc).AddTicks(9692),
                             DateOfBirth = new DateTime(1990, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "customer@gmail.com",
                             FirstName = "John",
+                            Gender = "",
                             Image = "",
                             LastName = "Doe",
-                            LastUpdated = new DateTime(2024, 10, 7, 8, 13, 49, 795, DateTimeKind.Utc).AddTicks(4891),
-                            PasswordHash = "$2a$11$.UE.yjCrVXmrN.TZCTH8zuXOOBUDfok0uuC9/fleBpR/avx1/.HhS",
+                            LastUpdated = new DateTime(2024, 10, 9, 18, 33, 55, 108, DateTimeKind.Utc).AddTicks(9692),
+                            PasswordHash = "$2a$11$Xspo7hXcmONtkN/3QlqL3eDrVEqeuvMI3X91cG4qCqwbBWv9TTpDq",
                             Phone = "123456789",
-                            RefreshTokenExpiryTime = new DateTime(2024, 11, 6, 8, 13, 49, 926, DateTimeKind.Utc).AddTicks(9987),
-                            RefreshTokenIssuedAt = new DateTime(2024, 10, 7, 8, 13, 49, 926, DateTimeKind.Utc).AddTicks(9995),
+                            RefreshTokenExpiryTime = new DateTime(2024, 11, 8, 18, 33, 55, 258, DateTimeKind.Utc).AddTicks(3105),
+                            RefreshTokenIssuedAt = new DateTime(2024, 10, 9, 18, 33, 55, 258, DateTimeKind.Utc).AddTicks(3115),
                             Role = "Customer"
                         },
                         new
                         {
                             ID = "user2",
-                            CreatedDate = new DateTime(2024, 10, 7, 8, 13, 49, 927, DateTimeKind.Utc).AddTicks(78),
+                            Balance = 0m,
+                            CreatedDate = new DateTime(2024, 10, 9, 18, 33, 55, 258, DateTimeKind.Utc).AddTicks(3201),
                             DateOfBirth = new DateTime(1992, 2, 2, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "reader@gmail.com",
                             FirstName = "Jane",
+                            Gender = "",
                             Image = "",
                             LastName = "Smith",
-                            LastUpdated = new DateTime(2024, 10, 7, 8, 13, 49, 927, DateTimeKind.Utc).AddTicks(78),
-                            PasswordHash = "$2a$11$wlIEd9njx1/ldlLXZn7zW.VSWNeIrxDT6x.1Bv5ipxNw2NASnCOZq",
+                            LastUpdated = new DateTime(2024, 10, 9, 18, 33, 55, 258, DateTimeKind.Utc).AddTicks(3201),
+                            PasswordHash = "$2a$11$yPF6Le3esl/5xmN5IAED4e/NVKZq7.BlQJijhdmrQRXL5rDaU4PIq",
                             Phone = "987654321",
-                            RefreshTokenExpiryTime = new DateTime(2024, 11, 6, 8, 13, 50, 59, DateTimeKind.Utc).AddTicks(1000),
-                            RefreshTokenIssuedAt = new DateTime(2024, 10, 7, 8, 13, 50, 59, DateTimeKind.Utc).AddTicks(1010),
+                            RefreshTokenExpiryTime = new DateTime(2024, 11, 8, 18, 33, 55, 414, DateTimeKind.Utc).AddTicks(5734),
+                            RefreshTokenIssuedAt = new DateTime(2024, 10, 9, 18, 33, 55, 414, DateTimeKind.Utc).AddTicks(5745),
                             Role = "Reader"
                         });
                 });
@@ -828,7 +835,6 @@ namespace Exe.Starot.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("PaymentStatus")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Status")

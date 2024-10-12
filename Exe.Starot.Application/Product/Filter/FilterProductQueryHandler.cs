@@ -3,6 +3,7 @@ using Exe.Starot.Application.Common.Pagination;
 using Exe.Starot.Application.TarotCard;
 using Exe.Starot.Application.TarotCard.Filter;
 using Exe.Starot.Domain.Entities.Repositories;
+using Exe.Starot.Infrastructure.Repositories;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -55,6 +56,12 @@ namespace Exe.Starot.Application.Product.Filter
                 };
             }
 
+            // Now, calculate the booking count for each package
+            var productIds = products.Select(pq => pq.ID).ToList();
+
+            // Assuming you have a booking repository or service to fetch booking data
+            var purchaseCounts = await _repository.GetTotalAmountForProducts(productIds, cancellationToken);
+
             // Handle pagination
             var query = products.AsQueryable();
             var totalCount = query.Count();
@@ -64,7 +71,10 @@ namespace Exe.Starot.Application.Product.Filter
 
             var pageCount = (int)Math.Ceiling((double)totalCount / request.PageSize);
             var dtos = _mapper.Map<List<ProductDto>>(items);
-
+            foreach (var dto in dtos)
+            {
+                dto.PurchaseCount = purchaseCounts.ContainsKey(dto.Id) ? purchaseCounts[dto.Id] : 0;
+            }
             // Return paged result
             return new PagedResult<ProductDto>
             {

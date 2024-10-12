@@ -57,7 +57,7 @@ namespace Exe.Starot.Application.Reader.Queries.FilterReader
 
             if (request.DateOfBirth.HasValue)
             {
-                readers = readers.Where(r => r.User.DateOfBirth == request.DateOfBirth).ToList();
+                readers = readers.Where(r => r.User.DateOfBirth == request.DateOfBirth?.ToString("dd/MM/yyyy")).ToList();
             }
 
             if (!string.IsNullOrEmpty(request.Expertise))

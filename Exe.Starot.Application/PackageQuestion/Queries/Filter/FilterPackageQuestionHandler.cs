@@ -70,6 +70,12 @@ namespace Exe.Starot.Application.PackageQuestion.Queries.Filter
                 };
             }
 
+            // Now, calculate the booking count for each package
+            var packageIds = packageQuestions.Select(pq => pq.ID).ToList();
+
+            // Assuming you have a booking repository or service to fetch booking data
+            var bookingCounts = await _packageQuestionRepository.GetBookingCountsForPackages(packageIds, cancellationToken);
+
             // Handle pagination
             var query = packageQuestions.AsQueryable();
             var totalCount = query.Count();
@@ -79,7 +85,10 @@ namespace Exe.Starot.Application.PackageQuestion.Queries.Filter
 
             var pageCount = (int)Math.Ceiling((double)totalCount / request.PageSize);
             var dtos = _mapper.Map<List<PackageQuestionDTO>>(items);
-
+            foreach (var dto in dtos)
+            {
+                dto.BookingCount = bookingCounts.ContainsKey(dto.Id) ? bookingCounts[dto.Id] : 0;
+            }
             // Return paged result
             return new PagedResult<PackageQuestionDTO>
             {

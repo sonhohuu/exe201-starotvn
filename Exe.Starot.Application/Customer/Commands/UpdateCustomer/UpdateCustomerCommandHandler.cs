@@ -18,6 +18,7 @@ namespace Exe.Starot.Application.Customer.Commands.UpdateCustomer
         public string? LastName { get; init; }
         public IFormFile? Image { get; init; }
         public string? Phone {  get; init; }
+        public string? Gender { get; init; }
         public DateTime? DateOfBirth { get; init; }
         public int MemberShip { get; init; } = 0;
     }
@@ -57,8 +58,9 @@ namespace Exe.Starot.Application.Customer.Commands.UpdateCustomer
             if (!string.IsNullOrEmpty(request.FirstName)) user.FirstName = request.FirstName;
             if (!string.IsNullOrEmpty(request.LastName)) user.LastName = request.LastName;
             if (!string.IsNullOrEmpty(request.Phone)) user.Phone = request.Phone;
-            if (request.DateOfBirth.HasValue) user.DateOfBirth = request.DateOfBirth.Value;
+            if (request.DateOfBirth.HasValue) user.DateOfBirth = request.DateOfBirth?.ToString("dd/MM/yyyy");
             if (request.MemberShip != 0 ) customer.Membership += request.MemberShip;
+            if (!string.IsNullOrEmpty(request.Gender)) user.Gender = CapitalizeFirstLetter(request.Gender.ToLower());
 
             // Handle image upload if a new image is provided
             if (request.Image != null)
@@ -79,6 +81,14 @@ namespace Exe.Starot.Application.Customer.Commands.UpdateCustomer
             _customerRepository.Update(customer);
             _userRepository.Update(user);
             return await _userRepository.UnitOfWork.SaveChangesAsync(cancellationToken) > 0 ? "Update Successfully!" : "Update Failed!";
+        }
+
+        public string CapitalizeFirstLetter(string input)
+        {
+            if (string.IsNullOrEmpty(input))
+                return input;
+
+            return char.ToUpper(input[0]) + input.Substring(1);
         }
     }
 

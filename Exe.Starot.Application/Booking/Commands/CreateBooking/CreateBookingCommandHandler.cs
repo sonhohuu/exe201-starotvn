@@ -44,24 +44,36 @@ namespace Exe.Starot.Application.Booking.Commands.CreateBooking
 
             if (customer == null)
             {
-                throw new NotFoundException("Customer not found.");
+                throw new NotFoundException("User not login.");
             }
 
             var customerId = customer.ID;
 
             var existingPackage = await _packageQuestionRepository.FindAsync(x => x.ID == request.PackageId && !x.DeletedDay.HasValue, cancellationToken); ;
 
-            if (existingPackage != null)
+            if (existingPackage == null)
             {
                 throw new NotFoundException("Package does not exist");
             }
+
+            var reader = await _readerRepository.FindAsync(c => c.UserId == request.ReaderId && c.DeletedDay == null, cancellationToken);
+
+            if (reader == null)
+            {
+                throw new NotFoundException("Reader not found.");
+            }
+
+            // Extract StartHour and Date from StartDate
+            var startHour = request.StartDate.ToString("HH:00");
+            var date = request.StartDate.ToString("dd/MM/yyyy");
 
             // Validate if the booking already exists
             var existingBooking = await _bookingRepository.FindAsync(
                 x => x.PackageId == request.PackageId &&
                      x.CustomerId == customerId &&
-                     x.ReaderId == request.ReaderId &&
-                     x.StartDate == request.StartDate &&
+                     x.ReaderId == reader.ID &&
+                     x.StartHour == startHour &&
+                     x.Date == date &&
                      !x.DeletedDay.HasValue,
                 cancellationToken);
 
@@ -82,9 +94,10 @@ namespace Exe.Starot.Application.Booking.Commands.CreateBooking
             {
                 PackageId = request.PackageId,
                 CustomerId = customerId,
-                ReaderId = request.ReaderId,
-                StartDate = request.StartDate,
-                EndDate = request.StartDate.AddMinutes(existingPackage.Time),
+                ReaderId = existingReader.ID,
+                StartHour = startHour,
+                Date = date,
+                EndHour = startHour,
                 Status = "Pending", // Default status to Pending 
                 LinkUrl = existingReader?.LinkUrl,
 

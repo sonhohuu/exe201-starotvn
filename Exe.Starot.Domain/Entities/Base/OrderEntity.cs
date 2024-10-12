@@ -8,8 +8,8 @@ public class OrderEntity : Entity
     public string Status { get; set; }
     [Column(TypeName = "decimal(18,2)")]
     public decimal Total { get; set; }
-    public DateTime OrderDate { get; set; }
-    public string PaymentStatus { get; set; } // Pending, Paid, Failed
+    public DateTime OrderDate { get; set; } = DateTime.UtcNow;
+    public string? PaymentStatus { get; set; } // Pending, Paid, Failed
 
     public virtual UserEntity User { get; set; }
     public virtual ICollection<OrderDetailEntity> OrderDetails { get; set; }
