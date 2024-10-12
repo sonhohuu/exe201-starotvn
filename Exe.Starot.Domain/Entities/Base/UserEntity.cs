@@ -30,6 +30,7 @@ namespace Exe.Starot.Domain.Entities.Base
         public virtual ICollection<CustomerEntity> Customers { get; set; }
         public virtual ICollection<ReaderEntity> Readers { get; set; }
         public virtual ICollection<UserAchievementEntity> UserAchievements { get; set; }
+        public virtual ICollection<TransactionEntity> Transactions { get; set; }
         public void SetRefreshToken(string token, DateTime expiry)
         {
             RefreshToken = token;

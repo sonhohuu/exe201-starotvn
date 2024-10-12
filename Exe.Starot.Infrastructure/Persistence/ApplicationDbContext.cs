@@ -30,6 +30,7 @@ namespace Exe.Starot.Infrastructure.Persistence
         public DbSet<TarotCardEntity> TarotCards { get; set; }
         public DbSet<PaymentEntity> Payments { get; set; }
         public DbSet<PaymentGatewayEntity> PaymentGateways { get; set; }
+        public DbSet<TransactionEntity> Transactions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -307,6 +308,17 @@ namespace Exe.Starot.Infrastructure.Persistence
                 .HasOne(ua => ua.Achievement)
                 .WithMany(a => a.UserAchievements)
                 .HasForeignKey(ua => ua.AchievementId);
+
+            modelBuilder.Entity<TransactionEntity>(entity =>
+            {
+                entity.Property(e => e.TransactionId).HasMaxLength(36);  // Typically longer to accommodate unique transaction IDs
+                entity.Property(e => e.UserId).HasMaxLength(36);         // User ID with room for alphanumeric characters
+                entity.Property(e => e.Type).IsRequired();               // Assuming Type is required, since it's an integer
+                entity.Property(e => e.Amount).IsRequired();             // Transaction amount must be specified, assuming no negative amounts allowed
+                entity.Property(e => e.Status).IsRequired();             // Status is required
+                entity.Property(e => e.TransactionDate).IsRequired();        // CreatedDate should always be present
+                entity.Property(e => e.CreatTime).IsRequired();          // CreatTime should also always be present
+            });
 
             // Additional Fluent API configurations can be added here, such as indexes or constraints
         }

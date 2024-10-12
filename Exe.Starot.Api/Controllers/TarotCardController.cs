@@ -97,7 +97,7 @@ namespace Exe.Starot.Api.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> UpdateTarotCard(
-            [FromBody] UpdateCardCommand command,
+            [FromForm] UpdateCardCommand command,
             CancellationToken cancellationToken = default)
         {
             if (command.Id <= 0)

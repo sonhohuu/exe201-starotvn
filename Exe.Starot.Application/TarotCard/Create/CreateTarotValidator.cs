@@ -17,7 +17,7 @@ namespace Exe.Starot.Application.TarotCard.Create
 
             RuleFor(command => command.Content)
               .NotEmpty().WithMessage("Content can't be empty or null")
-              .MaximumLength(300).WithMessage("Content can't be over 300 words");
+              .MaximumLength(1000).WithMessage("Content can't be over 300 words");
 
             RuleFor(x => x.Image)
         .NotEmpty().WithMessage("URL can't be empty");
