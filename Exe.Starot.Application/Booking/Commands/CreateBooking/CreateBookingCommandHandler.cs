@@ -56,37 +56,40 @@ namespace Exe.Starot.Application.Booking.Commands.CreateBooking
                 throw new NotFoundException("Package does not exist");
             }
 
-            var reader = await _readerRepository.FindAsync(c => c.UserId == request.ReaderId && c.DeletedDay == null, cancellationToken);
+            var existingReader = await _readerRepository.FindAsync(x => x.User.ID == request.ReaderId && !x.DeletedDay.HasValue, cancellationToken);
 
-            if (reader == null)
+            if (existingReader == null)
             {
-                throw new NotFoundException("Reader not found.");
+                throw new NotFoundException("Reader does not exist");
             }
 
             // Extract StartHour and Date from StartDate
             var startHour = request.StartDate.ToString("HH:00");
             var date = request.StartDate.ToString("dd/MM/yyyy");
 
-            // Validate if the booking already exists
+            // Validate if the booking already exists with the same reader or another reader at the same time, but allow booking with a different package
             var existingBooking = await _bookingRepository.FindAsync(
-                x => x.PackageId == request.PackageId &&
-                     x.CustomerId == customerId &&
-                     x.ReaderId == reader.ID &&
+                x => x.Date == date &&
                      x.StartHour == startHour &&
-                     x.Date == date &&
-                     !x.DeletedDay.HasValue,
+                     !x.DeletedDay.HasValue &&
+                     (
+                         (x.ReaderId == request.ReaderId) || // Same reader and same package
+                         (x.CustomerId == customerId && x.ReaderId != request.ReaderId) // Same customer with different reader
+                     ),
                 cancellationToken);
 
             if (existingBooking != null)
             {
-                throw new DuplicateWaitObjectException("This booking already exists.");
-            }
-
-            var existingReader = await _readerRepository.FindAsync(x => x.User.ID == request.ReaderId && !x.DeletedDay.HasValue,cancellationToken);
-
-            if (existingBooking != null)
-            {
-                throw new NotFoundException("Reader does not exist");
+                if (existingBooking.ReaderId == request.ReaderId)
+                {
+                    // Booking already exists with the same reader and same package at the same time
+                    throw new DuplicationException($"This booking with {existingBooking.Reader.User.LastName} at time {existingBooking.StartHour} already ordered.");
+                }
+                else if (existingBooking.CustomerId == customerId)
+                {
+                    // Customer already has a booking with another reader at the same time
+                    throw new DuplicationException($"You already have a booking with {existingBooking.Reader.User.LastName} at time {existingBooking.StartHour}.");
+                }
             }
 
             // Create new booking entity

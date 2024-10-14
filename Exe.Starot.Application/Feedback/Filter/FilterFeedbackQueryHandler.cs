@@ -24,7 +24,7 @@ namespace Exe.Starot.Application.Feedback.Filter
         public async Task<PagedResult<FeedbackDto>> Handle(FilterFeedbackQuery request, CancellationToken cancellationToken)
         {
             var feedbacks = await _feedbackRepository.FindAllAsync(f =>
-                (string.IsNullOrEmpty(request.ReaderId) || f.ReaderId == request.ReaderId) &&
+                (string.IsNullOrEmpty(request.ReaderId) || f.Reader.User.ID == request.ReaderId) &&
                 (!request.FromDate.HasValue || f.Date >= request.FromDate) &&
                 (!request.ToDate.HasValue || f.Date <= request.ToDate),
                 cancellationToken);

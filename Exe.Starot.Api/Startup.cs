@@ -21,58 +21,7 @@ namespace Exe.Starot.Api
 
         public void ConfigureServices(IServiceCollection services)
         {
-            // Add necessary services
-            services.AddControllers(opt => opt.Filters.Add(typeof(ExceptionFilter)));
-
-            services.AddSignalR();
-            services.AddScoped<OrderService>();
-            services.AddApplication(Configuration);
-            services.ConfigureApplicationSecurity(Configuration);
-            services.ConfigureProblemDetails();
-            services.ConfigureApiVersioning();
-            services.AddInfrastructure(Configuration);
-            services.ConfigureSwagger(Configuration);
-
-            // CORS policy
-            services.AddCors(options =>
-            {
-                options.AddPolicy("CorsPolicy",
-                    builder => builder
-                        .WithOrigins("https://localhost:7024")
-                        .AllowAnyHeader()
-                        .AllowAnyMethod()
-                        .AllowCredentials());
-            });
-            
-
-            // Register System.Text.Encoding
-            System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
-
-            // Validate FirebaseConfig section
-            var firebaseSection = Configuration.GetSection("FirebaseConfig");
-            if (!firebaseSection.Exists())
-            {
-                throw new ArgumentNullException("FirebaseConfig section does not exist in configuration.");
-            }
-
-            var firebaseConfig = firebaseSection.Get<FirebaseConfig>();
-            if (firebaseConfig == null)
-            {
-                throw new ArgumentNullException(nameof(firebaseConfig), "FirebaseConfig section is missing in configuration.");
-            }
-
-            services.AddSingleton<PayOS>(provider =>
-            {
-                string clientId = Configuration["PaymentEnvironment:PAYOS_CLIENT_ID"] ?? throw new Exception("Cannot find PAYOS_CLIENT_ID");
-                string apiKey = Configuration["PaymentEnvironment:PAYOS_API_KEY"] ?? throw new Exception("Cannot find PAYOS_API_KEY");
-                string checksumKey = Configuration["PaymentEnvironment:PAYOS_CHECKSUM_KEY"] ?? throw new Exception("Cannot find PAYOS_CHECKSUM_KEY");
-
-                return new PayOS(clientId, apiKey, checksumKey);
-
-            });
-
-            services.AddSingleton(firebaseConfig);
-            services.AddSingleton<FileUploadService>();
+            services.InstallerServicesInAssembly(Configuration);
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

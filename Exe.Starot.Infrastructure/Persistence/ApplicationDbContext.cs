@@ -180,6 +180,8 @@ namespace Exe.Starot.Infrastructure.Persistence
                 entity.Property(e => e.ID).HasMaxLength(36);
                 entity.Property(e => e.UserId).HasMaxLength(36);
                 entity.Property(e => e.Quote).HasMaxLength(1000);
+                entity.Property(e => e.Introduction).HasMaxLength(1000);
+                entity.Property(e => e.Experience).HasMaxLength(1000);
                 entity.Property(e => e.Image).HasMaxLength(255);
             });
 

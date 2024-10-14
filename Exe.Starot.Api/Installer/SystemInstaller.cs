@@ -5,6 +5,7 @@ using Exe.Starot.Application;
 using Exe.Starot.Infrastructure;
 using Exe.Starot.Application.FileUpload;
 using Exe.Starot.Api.Filters;
+using Net.payOS;
 
 namespace Exe.Starot.Api.Installer
 {
@@ -12,8 +13,9 @@ namespace Exe.Starot.Api.Installer
     {
         public void InstallServices(IServiceCollection services, IConfiguration configuration)
         {
+            // Add necessary services
             services.AddControllers(opt => opt.Filters.Add(typeof(ExceptionFilter)));
-            services.AddSignalR();
+
             services.AddSignalR();
             services.AddScoped<OrderService>();
             services.AddApplication(configuration);
@@ -22,6 +24,8 @@ namespace Exe.Starot.Api.Installer
             services.ConfigureApiVersioning();
             services.AddInfrastructure(configuration);
             services.ConfigureSwagger(configuration);
+
+            // CORS policy
             services.AddCors(options =>
             {
                 options.AddPolicy("CorsPolicy",
@@ -32,6 +36,11 @@ namespace Exe.Starot.Api.Installer
                         .AllowCredentials());
             });
 
+
+            // Register System.Text.Encoding
+            System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+
+            // Validate FirebaseConfig section
             var firebaseSection = configuration.GetSection("FirebaseConfig");
             if (!firebaseSection.Exists())
             {
@@ -43,6 +52,16 @@ namespace Exe.Starot.Api.Installer
             {
                 throw new ArgumentNullException(nameof(firebaseConfig), "FirebaseConfig section is missing in configuration.");
             }
+
+            services.AddSingleton<PayOS>(provider =>
+            {
+                string clientId = configuration["PaymentEnvironment:PAYOS_CLIENT_ID"] ?? throw new Exception("Cannot find PAYOS_CLIENT_ID");
+                string apiKey = configuration["PaymentEnvironment:PAYOS_API_KEY"] ?? throw new Exception("Cannot find PAYOS_API_KEY");
+                string checksumKey = configuration["PaymentEnvironment:PAYOS_CHECKSUM_KEY"] ?? throw new Exception("Cannot find PAYOS_CHECKSUM_KEY");
+
+                return new PayOS(clientId, apiKey, checksumKey);
+
+            });
 
             services.AddSingleton(firebaseConfig);
             services.AddSingleton<FileUploadService>();

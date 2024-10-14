@@ -11,8 +11,8 @@ namespace Exe.Starot.Domain.Entities.Base
 {
     public class UserEntity : Entity
     {
-        public string FirstName { get; set; } = string.Empty;
-        public string LastName { get; set; } = string.Empty;
+        public string? FirstName { get; set; } = string.Empty;
+        public string? LastName { get; set; } = string.Empty;
         public string? RefreshToken { get; set; }
         public DateTime RefreshTokenExpiryTime { get; set; }
         public DateTime RefreshTokenIssuedAt { get; set; }
@@ -22,8 +22,8 @@ namespace Exe.Starot.Domain.Entities.Base
         public decimal Balance { get; set; } = 0;
         public string Phone { get; set; } = string.Empty;
         public string? DateOfBirth { get; set; }
-        public string Image { get; set; } = string.Empty;
-        public string Gender {  get; set; } = string.Empty;
+        public string? Image { get; set; } = string.Empty;
+        public string? Gender {  get; set; } = string.Empty;
 
         public virtual ICollection<OrderEntity> Orders { get; set; }
         public virtual ICollection<FavoriteProductEntity> FavoriteProducts { get; set; }

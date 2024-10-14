@@ -19,6 +19,7 @@ namespace Exe.Starot.Domain.Entities.Base
         public string Introduction { get; set; } = string.Empty;
         public string Expertise {  get; set; } = string.Empty;
         public string Experience { get; set; } = string.Empty;
+        public string ExperienceYear { get; set; } = string.Empty;
 
         public virtual UserEntity User { get; set; }
         public virtual ICollection<FeedbackEntity> Feedbacks { get; set; }

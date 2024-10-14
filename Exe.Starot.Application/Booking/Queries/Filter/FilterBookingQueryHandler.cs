@@ -39,12 +39,12 @@ namespace Exe.Starot.Application.Booking.Queries.Filter
             // Apply filters based on provided query parameters
             if (!string.IsNullOrEmpty(request.CustomerId))
             {
-                bookings = bookings.Where(b => b.CustomerId == request.CustomerId).ToList();
+                bookings = bookings.Where(b => b.Customer.User.ID == request.CustomerId).ToList();
             }
 
             if (!string.IsNullOrEmpty(request.ReaderId))
             {
-                bookings = bookings.Where(b => b.ReaderId == request.ReaderId).ToList();
+                bookings = bookings.Where(b => b.Reader.User.ID == request.ReaderId).ToList();
             }
 
             if (!string.IsNullOrEmpty(request.Status))
@@ -56,6 +56,8 @@ namespace Exe.Starot.Application.Booking.Queries.Filter
             {
                 bookings = bookings.Where(b => b.Date == request.Date?.ToString("dd/MM/yyyy")).ToList();
             }
+
+            bookings.OrderBy(x => x.StartHour);
 
             // If no bookings are found, return an empty list
             if (!bookings.Any())
