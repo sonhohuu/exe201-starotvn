@@ -1,6 +1,5 @@
 ﻿using Exe.Starot.Application.FavoriteProduct;
 using Exe.Starot.Application.FavoriteProduct.Create;
-using Exe.Starot.Application.FavoriteProduct.Delete;
 using Exe.Starot.Application.FavoriteProduct.Get;
 using Exe.Starot.Domain.Common.Exceptions;
 using MediatR;
@@ -36,9 +35,13 @@ namespace Exe.Starot.Api.Controllers
                 var result = await _mediator.Send(command, cancellationToken);
                 return Ok(new JsonResponse<string>(StatusCodes.Status200OK, result, ""));
             }
-            catch (DuplicationException ex)
+            catch (NotFoundException ex)
             {
-                return BadRequest(new JsonResponse<string>(StatusCodes.Status400BadRequest, ex.Message, ""));
+                return NotFound(new JsonResponse<string>(StatusCodes.Status404NotFound, ex.Message, ""));
+            }
+            catch (UnauthorizedException ex)
+            {
+                return Unauthorized(new JsonResponse<string>(StatusCodes.Status401Unauthorized, ex.Message, ""));
             }
             catch (Exception ex)
             {
@@ -46,50 +49,23 @@ namespace Exe.Starot.Api.Controllers
             }
         }
 
-        // DELETE: api/v1/favorite-products/{productId}
-        [HttpDelete("{productId}")]
-        [Produces(MediaTypeNames.Application.Json)]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> RemoveFavoriteProduct(
-            [FromRoute] string productId,
-            CancellationToken cancellationToken = default)
-        {
-            try
-            {
-                var command = new DeleteFavoriteProductCommand { ProductId = productId };
-                var result = await _mediator.Send(command, cancellationToken);
-                return Ok(new JsonResponse<string>(StatusCodes.Status200OK, result, ""));
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound(new JsonResponse<string>(StatusCodes.Status404NotFound, ex.Message, ""));
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, new JsonResponse<string>(StatusCodes.Status500InternalServerError, ex.Message, ""));
-            }
-        }
         // GET: api/v1/favorite-products/user/{userId}
-        [HttpGet("user/{userId}")]
+        [HttpGet]
         [Produces(MediaTypeNames.Application.Json)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<IEnumerable<FavoriteProductDto>>> GetUserFavoriteProducts(
-            [FromRoute] string userId,
             CancellationToken cancellationToken = default)
         {
             try
             {
-                var query = new GetFavoriteProductsByUserQuery { UserId = userId };
+                var query = new GetFavoriteProductsByUserQuery();
                 var result = await _mediator.Send(query, cancellationToken);
                 return Ok(new JsonResponse<IEnumerable<FavoriteProductDto>>(StatusCodes.Status200OK, "Get Success", result));
             }
-            catch (NotFoundException ex)
+            catch (UnauthorizedException ex)
             {
-                return NotFound(new JsonResponse<string>(StatusCodes.Status404NotFound, ex.Message, ""));
+                return Unauthorized(new JsonResponse<string>(StatusCodes.Status401Unauthorized, ex.Message, ""));
             }
         }
     }

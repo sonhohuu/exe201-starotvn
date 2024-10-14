@@ -38,7 +38,7 @@ namespace Exe.Starot.Api.Controllers
             {
                 var result = await _mediator.Send(command, cancellationToken);
                 return CreatedAtAction(nameof(CreateProduct), new { id = result },
-                    new JsonResponse<string>(StatusCodes.Status201Created, result, "Create success!"));
+                    new JsonResponse<string>(StatusCodes.Status201Created, result, ""));
             }
             catch (DuplicationException ex)
             {

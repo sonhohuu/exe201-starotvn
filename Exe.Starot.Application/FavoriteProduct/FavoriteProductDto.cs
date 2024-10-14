@@ -11,13 +11,18 @@ namespace Exe.Starot.Application.FavoriteProduct
 {
     public class FavoriteProductDto : IMapFrom<FavoriteProductEntity>
     {
-        public string Id {  get; set; }
-        public string ProductId {get; set; }
-        public string UserId { get; set; }
+        public string? ProductId {get; set; }
+        public string? ProductName { get; set; }
+        public string? ProductPrice { get; set; }
+        public string? ProductImage { get; set; }
 
         public void Mapping(Profile profile)
         {
-            profile.CreateMap<FavoriteProductEntity, FavoriteProductDto>(); 
+            profile.CreateMap<FavoriteProductEntity, FavoriteProductDto>()
+                .ForMember(dto => dto.ProductId, opt => opt.MapFrom(entity => entity.Product.ID))
+                .ForMember(dto => dto.ProductName, opt => opt.MapFrom(entity => entity.Product.Name))
+                .ForMember(dto => dto.ProductPrice, opt => opt.MapFrom(entity => entity.Product.Price))
+                .ForMember(dto => dto.ProductImage, opt => opt.MapFrom(entity => entity.Product.Image));
         }
     }
 }
