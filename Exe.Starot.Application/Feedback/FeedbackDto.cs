@@ -13,15 +13,15 @@ namespace Exe.Starot.Application.Feedback
     {
 
         public string CustomerId { get; set; }
-        public string ReaderId { get; set; }
+        public string? CustomerImage {  get; set; }
         public int Rating { get; set; }
-        public string Comment { get; set; }
+        public string? Comment { get; set; }
         public DateTime Date { get; set; }
         public void Mapping(Profile profile)
         {
             profile.CreateMap<FeedbackEntity, FeedbackDto>()
                .ForMember(dto => dto.CustomerId, opt => opt.MapFrom(entity => entity.CustomerId))
-               .ForMember(dto => dto.ReaderId, opt => opt.MapFrom(entity => entity.ReaderId))
+               .ForMember(dto => dto.CustomerImage, opt => opt.MapFrom(entity => entity.Reader.User.Image))
                .ForMember(dto => dto.Rating, opt => opt.MapFrom(entity => entity.Rating))
                .ForMember(dto => dto.Comment, opt => opt.MapFrom(entity => entity.Comment))
                .ForMember(dto => dto.Date, opt => opt.MapFrom(entity => entity.Date));

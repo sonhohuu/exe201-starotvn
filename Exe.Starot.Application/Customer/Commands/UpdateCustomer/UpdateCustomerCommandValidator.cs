@@ -33,9 +33,9 @@ namespace Exe.Starot.Application.Customer.Commands.UpdateCustomer
 
             // Phone validation (example: ensuring it's a valid phone number format)
             RuleFor(x => x.Phone)
-                .Matches(@"^\+?[1-9]\d{1,14}$")
-                .When(x => !string.IsNullOrEmpty(x.Phone))
-                .WithMessage("Phone number must be valid.");
+                .Matches(@"^0\d{9,13}$") // Regex to match a phone number starting with 0 and containing 10 to 14 digits
+                .When(x => !string.IsNullOrEmpty(x.Phone)) // Only validate if the phone number is provided
+                .WithMessage("Phone number is invalid. Must start with 0 and contain 10 to 14 digits.");
 
             // DateOfBirth validation (example: optional, but must be in the past)
             RuleFor(x => x.DateOfBirth)

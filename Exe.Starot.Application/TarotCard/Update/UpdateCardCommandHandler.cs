@@ -32,7 +32,7 @@ namespace Exe.Starot.Application.TarotCard.Update
             {
                 throw new NotFoundException("Card is not found or deleted");
             }
-            var duplicateCard = await _repository.FindAsync(x => x.Name == request.Name && x.ID != request.Id, cancellationToken);
+            var duplicateCard = await _repository.FindAsync(x => x.ID != request.Id && !x.DeletedDay.HasValue, cancellationToken);
             if (duplicateCard != null)
             {
                 throw new DuplicationException("A Tarot card with this name already exists.");

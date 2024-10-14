@@ -29,10 +29,10 @@ namespace Exe.Starot.Application.TarotCard.Create
         public async Task<string> Handle(CreateTarotCardCommand request, CancellationToken cancellationToken)
         {
             // 1. Check if a card with the same name already exists
-            var duplicateCard = await _repository.FindAsync(x => x.Name == request.Name, cancellationToken);
+            var duplicateCard = await _repository.FindAsync(x => x.Name == request.Name && x.Type == request.Type && !x.DeletedDay.HasValue, cancellationToken);
             if (duplicateCard != null)
             {
-                throw new DuplicationException("A Tarot card with this name already exists.");
+                throw new DuplicationException("A Tarot card with this name and this type already exists.");
             }
 
             // 2. Handle image upload, if an image is provided

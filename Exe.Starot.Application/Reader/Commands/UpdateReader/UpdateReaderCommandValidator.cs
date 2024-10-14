@@ -33,9 +33,9 @@ namespace Exe.Starot.Application.Reader.Commands.UpdateReader
 
             // Validate Phone (if provided)
             RuleFor(x => x.Phone)
-                .Matches(@"^\+\d{1,3}\s\d{4,14}(?:x.+)?$")
-                .When(x => !string.IsNullOrEmpty(x.Phone))
-                .WithMessage("Phone number is invalid. Must include country code and follow international format.");
+                .Matches(@"^0\d{9,13}$") // Regex to match a phone number starting with 0 and containing 10 to 14 digits
+                .When(x => !string.IsNullOrEmpty(x.Phone)) // Only validate if the phone number is provided
+                .WithMessage("Phone number is invalid. Must start with 0 and contain 10 to 14 digits.");
 
             // Validate DateOfBirth (if provided)
             RuleFor(x => x.DateOfBirth)

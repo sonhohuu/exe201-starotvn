@@ -44,7 +44,7 @@ namespace Exe.Starot.Application.Booking.Commands.DeleteBooking
             var customerId = customer.ID;
 
             // Find the existing booking
-            var booking = await _bookingRepository.FindAsync(x => x.ID == request.BookingId && x.CustomerId == customerId && !x.DeletedDay.HasValue, cancellationToken);
+            var booking = await _bookingRepository.FindAsync(x => x.ID == request.BookingId && !x.DeletedDay.HasValue, cancellationToken);
 
             if (booking == null)
             {

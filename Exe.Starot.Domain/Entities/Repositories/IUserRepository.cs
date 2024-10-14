@@ -13,6 +13,5 @@ namespace Exe.Starot.Domain.Entities.Repositories
         bool VerifyPassword(string password, string passwordHash);
         string GeneratePassword();
         Task UpdateRefreshTokenAsync(UserEntity user, string newRefreshToken, DateTime expiryDate);
-
     }
 }

@@ -30,6 +30,7 @@ namespace Exe.Starot.Application.Customer
                 .ForMember(dto => dto.LastName, opt => opt.MapFrom(entity => entity.User.LastName))
                 .ForMember(dto => dto.Image, opt => opt.MapFrom(entity => entity.User.Image))
                 .ForMember(dto => dto.Phone, opt => opt.MapFrom(entity => entity.User.Phone))
+                .ForMember(dto => dto.Gender, opt => opt.MapFrom(entity => entity.User.Gender))
                 .ForMember(dto => dto.DateOfBirth, opt => opt.MapFrom(entity => entity.User.DateOfBirth));
                 
         }

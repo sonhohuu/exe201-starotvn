@@ -39,6 +39,7 @@ namespace Exe.Starot.Infrastructure
             services.AddTransient<IBookingRepository, BookingRepository>();
             services.AddTransient<ICustomerRepository, CustomerRepository>();
             services.AddTransient<IFeedBackRepository, FeedBackRepository>();
+            services.AddTransient<ITransactionRepository, TransactionRepository>();
             services.AddAutoMapper(typeof(ApplicationDbContext));
 
             return services;

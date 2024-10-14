@@ -18,13 +18,11 @@ namespace Exe.Starot.Api.Controllers
     [Route("api/v1/tarotcards")]
     public class TarotCardController : ControllerBase
     {
-        private readonly IResponseCacheService _responseCacheService;
         private readonly ISender _mediator;
 
-        public TarotCardController(ISender mediator, IResponseCacheService responseCacheService)
+        public TarotCardController(ISender mediator)
         {
             _mediator = mediator;
-            _responseCacheService = responseCacheService;
         }
 
         // POST: api/v1/tarotcards
@@ -35,20 +33,13 @@ namespace Exe.Starot.Api.Controllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> CreateTarotCard(
-    [FromForm] CreateTarotCardCommand command,
-    CancellationToken cancellationToken = default)
+            [FromForm] CreateTarotCardCommand command,
+                CancellationToken cancellationToken = default)
         {
             try
             {
                 var result = await _mediator.Send(command, cancellationToken);
 
-                // Remove old cache
-                await _responseCacheService.RemoveCacheResponseAsync("api/v1/tarotcards"); // GetAll cache
-                await _responseCacheService.RemoveCacheResponseAsync("api/v1/tarotcards/random"); // Random card cache
-
-                // Fetch the latest data and update the cache
-                var updatedCards = await _mediator.Send(new FilterTarotCardQuery(), cancellationToken);
-                await _responseCacheService.SetCacheResponseAsync("api/v1/tarotcards", updatedCards, TimeSpan.FromMinutes(30));
 
                 return CreatedAtAction(nameof(CreateTarotCard), new { id = result },
                     new JsonResponse<string>(StatusCodes.Status201Created, result, "Create success!"));
@@ -67,7 +58,6 @@ namespace Exe.Starot.Api.Controllers
 
         // GET: api/v1/tarotcards/random
         [HttpGet("random")]
-        [Cache(1000)]
         [Produces(MediaTypeNames.Application.Json)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -86,7 +76,6 @@ namespace Exe.Starot.Api.Controllers
 
         // GET: api/v1/tarotcards
         [HttpGet]
-        [Cache(1000)]
         [Produces(MediaTypeNames.Application.Json)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -113,8 +102,8 @@ namespace Exe.Starot.Api.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> UpdateTarotCard(
-    [FromBody] UpdateCardCommand command,
-    CancellationToken cancellationToken = default)
+            [FromBody] UpdateCardCommand command,
+                CancellationToken cancellationToken = default)
         {
             if (command.Id <= 0)
             {
@@ -124,14 +113,6 @@ namespace Exe.Starot.Api.Controllers
             try
             {
                 var result = await _mediator.Send(command, cancellationToken);
-
-                // Remove old cache
-                await _responseCacheService.RemoveCacheResponseAsync("api/v1/tarotcards"); // GetAll cache
-                await _responseCacheService.RemoveCacheResponseAsync("api/v1/tarotcards/random"); // Random card cache
-
-                // Fetch the latest data and update the cache
-                var updatedCards = await _mediator.Send(new FilterTarotCardQuery(), cancellationToken);
-                await _responseCacheService.SetCacheResponseAsync("api/v1/tarotcards", updatedCards, TimeSpan.FromMinutes(30));
 
                 return Ok(new JsonResponse<string>(StatusCodes.Status200OK, result, "Update success!"));
             }
@@ -166,14 +147,6 @@ namespace Exe.Starot.Api.Controllers
             try
             {
                 var result = await _mediator.Send(new DeleteTarotCardCommand {Id = id }, cancellationToken);
-
-                // Remove old cache
-                await _responseCacheService.RemoveCacheResponseAsync("api/v1/tarotcards"); // GetAll cache
-                await _responseCacheService.RemoveCacheResponseAsync("api/v1/tarotcards/random"); // Random card cache
-
-                // Fetch the latest data and update the cache
-                var updatedCards = await _mediator.Send(new FilterTarotCardQuery(), cancellationToken);
-                await _responseCacheService.SetCacheResponseAsync("api/v1/tarotcards", updatedCards, TimeSpan.FromMinutes(30));
 
                 return Ok(new JsonResponse<string>(StatusCodes.Status200OK, result, "Delete success!"));
             }

@@ -2,6 +2,7 @@
 using Exe.Starot.Domain.Common.Exceptions;
 using Exe.Starot.Domain.Entities.Base;
 using Exe.Starot.Domain.Entities.Repositories;
+using Exe.Starot.Infrastructure.Repositories;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -16,12 +17,14 @@ namespace Exe.Starot.Application.Feedback.Create
         private readonly IFeedBackRepository _feedbackRepository;
         private readonly ICurrentUserService _currentUserService;
         private readonly ICustomerRepository _customerRepository;
+        private readonly IReaderRepository _readerRepository;
 
-        public CreateFeedbackCommandHandler(IFeedBackRepository feedbackRepository, ICurrentUserService currentUserService, ICustomerRepository customerRepository)
+        public CreateFeedbackCommandHandler(IFeedBackRepository feedbackRepository, ICurrentUserService currentUserService, ICustomerRepository customerRepository, IReaderRepository readerRepository)
         {
             _feedbackRepository = feedbackRepository;
             _currentUserService = currentUserService;
             _customerRepository = customerRepository;
+            _readerRepository = readerRepository;
         }
 
 
@@ -36,14 +39,19 @@ namespace Exe.Starot.Application.Feedback.Create
             {
                 throw new UnauthorizedAccessException("User is not logged in.");
             }
-
             var customerId = customer.ID;
 
+            var reader = await _readerRepository.FindAsync(c => c.UserId == request.ReaderId && c.DeletedDay == null, cancellationToken);
+
+            if (reader == null)
+            {
+                throw new NotFoundException("Reader not found.");
+            }
 
             var feedback = new FeedbackEntity
             {
                 CustomerId = customerId,
-                ReaderId = request.ReaderId,
+                ReaderId = reader.ID,
                 Rating = request.Rating,
                 Comment = request.Comment,
                 Date = DateTime.UtcNow

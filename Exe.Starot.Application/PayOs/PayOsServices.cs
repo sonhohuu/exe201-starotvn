@@ -1,4 +1,7 @@
-﻿using Exe.Starot.Application.Payment;
+﻿using Exe.Starot.Application.Common.Interfaces;
+using Exe.Starot.Domain.Entities.Repositories;
+using Net.payOS;
+using Net.payOS.Types;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,78 +10,94 @@ using System.Threading.Tasks;
 
 namespace Exe.Starot.Application.PayOs
 {
-    //public class PayOsServices : IPayOsServices
-    //{
-    //    public async Task<string> CreatePaymentLink(PaymentRequest model)
-    //    {
-    //        string txnRef = GenerateTransactionId();
-    //        //long orderCode = long.Parse(txnRef.Substring(5));
-    //        var transaction = new Repositories.Entities.Transaction
-    //        {
-    //            TransactionId = txnRef,
-    //            UserId = model.UserId.ToUpper(),
-    //            Type = 2,                 // recharge 
-    //            Amount = (int)model.Amount,
-    //            Status = 2,               // Pending
-    //            CreatedDate = DateTime.Now,
-    //            CreatTime = DateTime.Now.TimeOfDay
-    //        };
-    //        _transactionRepository.Add(transaction);
-    //        _transactionRepository.SaveChanges();
+    public class PayOsServices
+    {
+        private readonly ITransactionRepository _transactionRepository;
+        private readonly PayOS _payOs;
+        private readonly ICurrentUserService _currentUserService;
+        private readonly IUserRepository _userRepository;
 
-    //        long expiredAt = (long)(DateTime.UtcNow.AddMinutes(10) - new DateTime(1970, 1, 1)).TotalSeconds;
-    //        PaymentData paymentData = new PaymentData(
-    //            orderCode: long.Parse(txnRef.Substring(5)),
-    //            amount: (int)model.Amount,
-    //            description: $"Deposit {model.Amount} into wallet",
-    //            items: new List<ItemData>(),
-    //            cancelUrl: "https://dev.fancy.io.vn/paymen-failed/",
-    //            returnUrl: "https://dev.fancy.io.vn/payment-page/",
-    //            expiredAt: expiredAt
-    //        );
+        public PayOsServices(ITransactionRepository transactionRepository, PayOS payOs, ICurrentUserService currentUserService, IUserRepository userRepository)
+        {
+            _transactionRepository = transactionRepository;
+            _payOs = payOs;
+            _currentUserService = currentUserService;
+            _userRepository = userRepository;
+        }
+        public async Task<string> CreatePaymentLink(PaymentRequest model)
+        {
+            if (_currentUserService.UserId == null)
+            {
+                throw new UnauthorizedAccessException("User not login yet");
+            }
 
-    //        CreatePaymentResult createPaymentResult = await _payOs.createPaymentLink(paymentData);
-    //        return createPaymentResult.checkoutUrl;
-    //    }
+            string txnRef = GenerateTransactionId();
+            long orderCode = long.Parse(txnRef.Substring(5));
+            var transaction = new Domain.Entities.Base.TransactionEntity
+            {
+                TransactionId = txnRef,
+                UserId = _currentUserService.UserId,
+                Type = 2,                 // recharge 
+                Amount = (int)model.Amount,
+                Status = 2,               // Pending
+                TransactionDate = DateTime.UtcNow,
+                CreatTime = DateTime.UtcNow.TimeOfDay
+            };
+            _transactionRepository.Add(transaction);
+            await _transactionRepository.UnitOfWork.SaveChangesAsync();
 
-    //    public async Task<ResultModel> ProcessPaymentResponse(WebhookType webhookBody)
-    //    {
+            long expiredAt = (long)(DateTime.UtcNow.AddMinutes(10) - new DateTime(1970, 1, 1)).TotalSeconds;
 
-    //        WebhookData verifiedData = _payOs.verifyPaymentWebhookData(webhookBody); //xác thực data from webhook
-    //        string responseCode = verifiedData.code;
+            ItemData item = new ItemData("Mì tôm hảo hảo ly", 1, 1000);
+            List<ItemData> items = new List<ItemData>();
 
-    //        string orderCode = verifiedData.orderCode.ToString();
+            PaymentData paymentData = new PaymentData(orderCode, (int)model.Amount, $"Desposit {model.Amount} in Wallet", items, "cancelUrl", "returnUrl");
+            CreatePaymentResult createPaymentResult = await _payOs.createPaymentLink(paymentData);
+            return createPaymentResult.checkoutUrl;
+        }
 
-    //        string transactionId = "TRANS" + orderCode;
+        public async Task<ResultModel> ProcessPaymentResponse(WebhookType webhookBody)
+        {
 
-    //        var transaction = _transactionRepository.GetByTransactionId(transactionId);
+            WebhookData verifiedData = _payOs.verifyPaymentWebhookData(webhookBody); //xác thực data from webhook
+            string responseCode = verifiedData.code;
 
-    //        if (transaction != null && responseCode == "00")
-    //        {
-    //            transaction.Status = 1; // Success
-    //            _transactionRepository.Update(transaction);
-    //            await _transactionRepository.SaveChangesAsync();
+            string orderCode = verifiedData.orderCode.ToString();
 
-    //            var user = _userService.GetUserById(transaction.UserId);
-    //            if (user != null)
-    //            {
-    //                var result = await _userService.UpdateUserBalance(transaction.UserId, transaction.Amount / 1000);
-    //                result.Code = 0;
-    //                return result;
-    //            }
-    //        }
-    //        else
-    //        {
-    //            if (transaction != null)
-    //            {
-    //                transaction.Status = 3; // Faild
-    //                _transactionRepository.Update(transaction);
-    //                await _transactionRepository.SaveChangesAsync();
-    //            }
-    //        }
-    //        return new ResultModel { IsSuccess = false, Code = int.Parse(responseCode), Message = "Payment failed" };
-    //    }
+            string transactionId = "TRANS" + orderCode;
 
+            var transaction = await _transactionRepository.FindAsync(x => x.TransactionId == transactionId);
 
-    //}
+            if (transaction != null && responseCode == "00")
+            {
+                transaction.Status = 1; // Success
+                _transactionRepository.Update(transaction);
+                await _transactionRepository.UnitOfWork.SaveChangesAsync();
+
+                var existUser = await _userRepository.FindAsync(x => x.ID == transaction.UserId && !x.DeletedDay.HasValue);
+                if (existUser != null)
+                {
+                    existUser.Balance += transaction.Amount / 1000;
+                    _userRepository.Update(existUser);
+                    await _userRepository.UnitOfWork.SaveChangesAsync();
+                    return new ResultModel { IsSuccess = true, Code = 0, Message = "Payment success" };
+                }
+            }
+            else
+            {
+                if (transaction != null)
+                {
+                    transaction.Status = 3; // Fail
+                    _transactionRepository.Update(transaction);
+                    await _transactionRepository.UnitOfWork.SaveChangesAsync();
+                }
+            }
+            return new ResultModel { IsSuccess = false, Code = int.Parse(responseCode), Message = "Payment failed" };
+        }
+
+        private string GenerateTransactionId()
+        {
+            return "TRANS" + DateTimeOffset.Now.ToString("fff"); // You can improve this logic
+        }
+    }
 }

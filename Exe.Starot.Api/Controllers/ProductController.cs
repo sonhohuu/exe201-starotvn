@@ -17,11 +17,9 @@ namespace Exe.Starot.Api.Controllers
     [Route("api/v1/products")]
     public class ProductController : ControllerBase
     {
-        private readonly IResponseCacheService _responseCacheService;
         private readonly ISender _mediator;
-        public ProductController(ISender mediator, IResponseCacheService responseCacheService)
+        public ProductController(ISender mediator)
         {
-            _responseCacheService = responseCacheService;
             _mediator = mediator;
         }
 
@@ -39,14 +37,6 @@ namespace Exe.Starot.Api.Controllers
             try
             {
                 var result = await _mediator.Send(command, cancellationToken);
-
-                // Remove old cache
-                await _responseCacheService.RemoveCacheResponseAsync("api/v1/products"); // Invalidate the cache for GetAll products
-
-                // Fetch updated product data and cache it
-                var updatedProducts = await _mediator.Send(new FilterProductQuery(), cancellationToken);
-                await _responseCacheService.SetCacheResponseAsync("api/v1/products", updatedProducts, TimeSpan.FromMinutes(30)); // Set new cache with updated products
-
                 return CreatedAtAction(nameof(CreateProduct), new { id = result },
                     new JsonResponse<string>(StatusCodes.Status201Created, result, "Create success!"));
             }
@@ -64,7 +54,6 @@ namespace Exe.Starot.Api.Controllers
 
         // GET: api/v1/products
         [HttpGet]
-        [Cache(10000)]
         [Produces(MediaTypeNames.Application.Json)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -94,15 +83,11 @@ namespace Exe.Starot.Api.Controllers
     [FromForm] UpdateProductCommand command,
     CancellationToken cancellationToken = default)
         {
-            await _responseCacheService.RemoveCacheResponseAsync("api/v1/products"); // Invalidate the cache for GetAll products
 
             try
             {
                 var result = await _mediator.Send(command, cancellationToken);
 
-                // Fetch updated product data and cache it
-                var updatedProducts = await _mediator.Send(new FilterProductQuery(), cancellationToken);
-                await _responseCacheService.SetCacheResponseAsync("api/v1/products", updatedProducts, TimeSpan.FromMinutes(30)); // Set new cache with updated products
 
                 return Ok(new JsonResponse<string>(StatusCodes.Status200OK, result, "Update success!"));
             }
@@ -131,16 +116,12 @@ namespace Exe.Starot.Api.Controllers
       [FromRoute] string id,
       CancellationToken cancellationToken = default)
         {
-            await _responseCacheService.RemoveCacheResponseAsync("api/v1/products"); // Invalidate the cache for GetAll products
 
             try
             {
                 var command = new DeleteProductCommand { Id = id };
                 var result = await _mediator.Send(command, cancellationToken);
 
-                // Fetch updated product data and cache it
-                var updatedProducts = await _mediator.Send(new FilterProductQuery(), cancellationToken);
-                await _responseCacheService.SetCacheResponseAsync("api/v1/products", updatedProducts, TimeSpan.FromMinutes(30)); // Set new cache with updated products
 
                 return Ok(new JsonResponse<string>(StatusCodes.Status200OK, result, "Delete success!"));
             }

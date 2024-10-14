@@ -27,7 +27,7 @@ namespace Exe.Starot.Application.Product.Create
                 .NotEmpty().WithMessage("URL can't be empty");
             RuleFor(x => x.ProductDescription)
              .NotEmpty().WithMessage("Description can't be empty or null")
-              .MaximumLength(150).WithMessage("Description can't be over 150 words");
+              .MaximumLength(1000).WithMessage("Description can't be over 150 words");
 
         }
     }

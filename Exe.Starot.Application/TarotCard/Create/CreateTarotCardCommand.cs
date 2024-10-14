@@ -16,7 +16,6 @@ namespace Exe.Starot.Application.TarotCard.Create
             Content = content;
             Type = type;
             Image = imageFile;
-
         }
         public string Name { get; set; }         // Name of the Tarot card
         public string Content { get; set; }      // Description or content

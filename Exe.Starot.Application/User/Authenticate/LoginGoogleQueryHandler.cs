@@ -28,23 +28,6 @@ namespace Exe.Starot.Application.User.Authenticate
 
             var userLoginDto = _mapper.Map<UserLoginDTO>(user);
 
-            var customer = user.Customers?.FirstOrDefault();
-            if (customer != null)
-            {
-                userLoginDto.EntityId = customer.ID.ToString();
-                userLoginDto.Role = "Customer";
-            }
-            else if (user.Readers?.Any() == true)
-            {
-                var reader = user.Readers.FirstOrDefault();
-                userLoginDto.EntityId = reader?.ID.ToString();
-                userLoginDto.Role = "Reader";
-            }
-            else
-            {
-                throw new NotFoundException($"No associated entity found for user - {request.Email}");
-            }
-
             return userLoginDto;
         }
     }

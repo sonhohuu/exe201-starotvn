@@ -19,10 +19,12 @@ namespace Exe.Starot.Application.Reader.Commands.UpdateReader
         public IFormFile? Image { get; init; }
         public string? Phone { get; init; }
         public DateTime? DateOfBirth { get; init; }
+        public string? Introduction {  get; init; }
         public string? Expertise { get; init; }
         public string? Gender { get; init; }
         public string? Quote { get; init; }
         public string? Experience { get; init; }
+        public string? ExperienceYear { get; init; }
         public decimal? Rating { get; init; }
         public string? LinkUrl { get; init; }
     }
@@ -65,6 +67,8 @@ namespace Exe.Starot.Application.Reader.Commands.UpdateReader
             if (!string.IsNullOrEmpty(request.Phone)) user.Phone = request.Phone;
             if (request.DateOfBirth.HasValue) user.DateOfBirth = request.DateOfBirth?.ToString("dd/MM/yyyy");
             if (!string.IsNullOrEmpty(request.Expertise)) reader.Expertise = request.Expertise;
+            if (!string.IsNullOrEmpty(request.Introduction)) reader.Introduction = request.Introduction;
+            if (!string.IsNullOrEmpty(request.ExperienceYear)) reader.ExperienceYear = request.ExperienceYear;
             if (!string.IsNullOrEmpty(request.Quote)) reader.Quote = request.Quote;
             if (!string.IsNullOrEmpty(request.Experience)) reader.Experience = request.Experience;
             if (request.Rating.HasValue) reader.Rating = request.Rating.Value;

@@ -8,13 +8,13 @@ using System.Threading.Tasks;
 
 namespace Exe.Starot.Application.TarotCard.Update
 {
-    public class UpdateCardCommand : IRequest<string>
+    public record UpdateCardCommand : IRequest<string>
     {
-        public int Id { get; set; }
-        public string? Name { get; set; }
-         public string? Type {  get; set; }
-        public string ? Content {  get; set; }
-        public IFormFile? imagefile { get; set; }
+        public int Id { get; init; }
+        public string? Name { get; init; }
+        public string? Type {  get; init; }
+        public string ? Content {  get; init; }
+        public IFormFile? imagefile { get; init; }
     
             public UpdateCardCommand() { }  
  
