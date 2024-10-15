@@ -42,4 +42,18 @@ namespace Exe.Starot.Application.Reader
                 
         }
     }
+
+    public class ReaderWithInfoDTO : ReaderDTO
+    {
+        public decimal? Balance { get; set; }
+        public string? Email { get; set; }
+
+        public new void Mapping(Profile profile)
+        {
+            profile.CreateMap<ReaderEntity, ReaderWithInfoDTO>()
+                .IncludeBase<ReaderEntity, ReaderDTO>()
+                .ForMember(dto => dto.Email, opt => opt.MapFrom(entity => entity.User.Email))
+                .ForMember(dto => dto.Balance, opt => opt.MapFrom(entity => entity.User.Balance));
+        }
+    }
 }

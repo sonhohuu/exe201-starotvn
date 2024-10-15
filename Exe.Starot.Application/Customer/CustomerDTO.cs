@@ -20,7 +20,7 @@ namespace Exe.Starot.Application.Customer
         public string? Phone { get; set; }
         public string? Gender { get; set; }
         public string? DateOfBirth { get; set; }
-        public int MemberShip { get; set; } = 0;
+        public int MemberShip { get; set; }
 
         public void Mapping(Profile profile)
         {
@@ -33,6 +33,20 @@ namespace Exe.Starot.Application.Customer
                 .ForMember(dto => dto.Gender, opt => opt.MapFrom(entity => entity.User.Gender))
                 .ForMember(dto => dto.DateOfBirth, opt => opt.MapFrom(entity => entity.User.DateOfBirth));
                 
+        }
+    }
+
+    public class CustomerWithInfoDTO : CustomerDTO
+    {
+        public decimal? Balance { get; set; }
+        public string? Email {  get; set; }
+
+        public new void Mapping(Profile profile)
+        {
+            profile.CreateMap<CustomerEntity, CustomerWithInfoDTO>()
+                .IncludeBase<CustomerEntity, CustomerDTO>()
+                .ForMember(dto => dto.Email, opt => opt.MapFrom(entity => entity.User.Email))
+                .ForMember(dto => dto.Balance, opt => opt.MapFrom(entity => entity.User.Balance));
         }
     }
 }

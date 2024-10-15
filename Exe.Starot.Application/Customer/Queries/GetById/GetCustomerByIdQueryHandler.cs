@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Exe.Starot.Application.Common.Interfaces;
 using Exe.Starot.Domain.Common.Exceptions;
 using Exe.Starot.Domain.Entities.Repositories;
 using MediatR;
@@ -11,33 +12,39 @@ using System.Threading.Tasks;
 
 namespace Exe.Starot.Application.Customer.Queries.GetById
 {
-    public class GetCustomerByIdQuery : IRequest<CustomerDTO>
+    public class GetCustomerByIdQuery : IRequest<CustomerWithInfoDTO>
     {
-        [Required]
-        public required string Id { get; set; }
     }
 
-    public class GetCustomerByIdQueryHandler : IRequestHandler<GetCustomerByIdQuery, CustomerDTO>
+    public class GetCustomerByIdQueryHandler : IRequestHandler<GetCustomerByIdQuery, CustomerWithInfoDTO>
     {
         private readonly ICustomerRepository _customerRepository;
+        private readonly ICurrentUserService _currentUserService;
         private readonly IMapper _mapper;
 
-        public GetCustomerByIdQueryHandler(ICustomerRepository customerRepository, IMapper mapper)
+        public GetCustomerByIdQueryHandler(ICustomerRepository customerRepository, IMapper mapper, ICurrentUserService currentUserService)
         {
             _customerRepository = customerRepository;
+            _currentUserService = currentUserService;
             _mapper = mapper;
         }
 
-        public async Task<CustomerDTO> Handle(GetCustomerByIdQuery request, CancellationToken cancellationToken)
+        public async Task<CustomerWithInfoDTO> Handle(GetCustomerByIdQuery request, CancellationToken cancellationToken)
         {
+            var userId = _currentUserService.UserId;
+
+            if (userId == null)
+            {
+                throw new UnauthorizedException("User not login");
+            }
             // Find the customer by Id
-            var customer = await _customerRepository.FindAsync(c => c.User.ID == request.Id && c.DeletedDay == null, cancellationToken);
+            var customer = await _customerRepository.FindAsync(c => c.User.ID == userId && c.DeletedDay == null, cancellationToken);
 
             if (customer == null)
             {
                 throw new NotFoundException("Customer not found.");
             }
-            var dto = customer.MapToCustomerDTO(_mapper);
+            var dto = customer.MapToCustomerWithInfoDTO(_mapper);
 
             return dto;
         }

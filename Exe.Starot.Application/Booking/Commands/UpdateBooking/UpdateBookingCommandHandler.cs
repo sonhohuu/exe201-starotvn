@@ -23,11 +23,12 @@ namespace Exe.Starot.Application.Booking.Commands.UpdateBooking
         private readonly IPackageQuestionRepository _packageQuestionRepository;
         private readonly IUserRepository _userRepository;
 
-        public UpdateBookingCommandHandler(IBookingRepository bookingRepository, ICurrentUserService currentUserService, IPackageQuestionRepository packageQuestionRepository)
+        public UpdateBookingCommandHandler(IBookingRepository bookingRepository, ICurrentUserService currentUserService, IPackageQuestionRepository packageQuestionRepository, IUserRepository userRepository)
         {
             _bookingRepository = bookingRepository;
             _currentUserService = currentUserService;
             _packageQuestionRepository = packageQuestionRepository;
+            _userRepository = userRepository;
         }
 
         public async Task<string> Handle(UpdateBookingCommand request, CancellationToken cancellationToken)
@@ -46,7 +47,29 @@ namespace Exe.Starot.Application.Booking.Commands.UpdateBooking
             {
                 throw new NotFoundException("Booking not found.");
             }
-            booking.Status = request.Status ?? booking.Status;
+
+            if (booking.Status == "Đã hủy")
+            {
+                throw new ArgumentException("Không thể hủy booking đã hủy");
+            }
+
+            if (booking.Status == "Hoàn thành" && request.Status == "Đã hủy")
+            {
+                throw new ArgumentException("Không thể hủy booking hoàn thành");
+            }
+            else if (request.Status == "Đã hủy")
+            {
+                var userOrder = await _userRepository.FindAsync(x => x.ID == booking.Customer.UserId && !x.DeletedDay.HasValue, cancellationToken);
+                if (userOrder != null)
+                {
+                    userOrder.Balance += booking.Package.Price;
+                    userOrder.LastUpdated = DateTime.UtcNow;
+                    _userRepository.Update(userOrder);
+                    await _userRepository.UnitOfWork.SaveChangesAsync(cancellationToken);
+                }
+            }
+
+            booking.Status = request.Status;
 
             // Mark as modified
             booking.UpdatedBy = _currentUserService.UserId;

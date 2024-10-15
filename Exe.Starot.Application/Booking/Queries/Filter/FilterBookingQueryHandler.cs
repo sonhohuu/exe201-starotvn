@@ -1,7 +1,10 @@
 ﻿using AutoMapper;
+using Exe.Starot.Application.Common.Interfaces;
 using Exe.Starot.Application.Common.Pagination;
 using Exe.Starot.Domain.Entities.Repositories;
+using Exe.Starot.Infrastructure.Persistence;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,52 +18,64 @@ namespace Exe.Starot.Application.Booking.Queries.Filter
         public string? CustomerId { get; set; }
         public string? ReaderId { get; set; }
         public string? Status { get; set; }
-        public DateTime? Date { get; set; }
+        public bool? ViewMyBooking { get; set; }
+        public string? Date { get; set; }
         public int PageNumber { get; set; } = 1;
         public int PageSize { get; set; } = 10;
     }
 
     public class FilterBookingQueryHandler : IRequestHandler<FilterBookingQuery, PagedResult<BookingDTO>>
     {
-        private readonly IBookingRepository _repository;
+        private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
+        private readonly ICurrentUserService _currentUserService;
 
-        public FilterBookingQueryHandler(IBookingRepository repository, IMapper mapper)
+        public FilterBookingQueryHandler(IMapper mapper, ApplicationDbContext context, ICurrentUserService currentUserService)
         {
-            _repository = repository;
             _mapper = mapper;
+            _context = context;
+            _currentUserService = currentUserService;
         }
 
         public async Task<PagedResult<BookingDTO>> Handle(FilterBookingQuery request, CancellationToken cancellationToken)
         {
-            // Fetch all bookings excluding soft-deleted ones
-            var bookings = await _repository.FindAllAsync(b => b.DeletedDay == null, cancellationToken);
+            // Start with the base query filtering out soft-deleted bookings
+            var query = _context.Bookings.AsQueryable();
 
-            // Apply filters based on provided query parameters
+            // If ViewMyBooking is true, filter by current user's ID
+            if (request.ViewMyBooking.HasValue && request.ViewMyBooking.Value)
+            {
+                query = query.Where(b => b.Customer.User.ID == _currentUserService.UserId);
+            }
+
+            // Apply other filters based on provided query parameters
             if (!string.IsNullOrEmpty(request.CustomerId))
             {
-                bookings = bookings.Where(b => b.Customer.User.ID == request.CustomerId).ToList();
+                query = query.Where(b => b.Customer.User.ID == request.CustomerId);
             }
 
             if (!string.IsNullOrEmpty(request.ReaderId))
             {
-                bookings = bookings.Where(b => b.Reader.User.ID == request.ReaderId).ToList();
+                query = query.Where(b => b.Reader.User.ID == request.ReaderId);
             }
 
             if (!string.IsNullOrEmpty(request.Status))
             {
-                bookings = bookings.Where(b => b.Status.ToLower().Contains(request.Status.ToLower())).ToList();
+                query = query.Where(b => b.Status.ToLower().Contains(request.Status.ToLower()));
             }
 
-            if (request.Date.HasValue)
+            if (!string.IsNullOrEmpty(request.Date))
             {
-                bookings = bookings.Where(b => b.Date == request.Date?.ToString("dd/MM/yyyy")).ToList();
+                query = query.Where(b => b.Date == request.Date);
             }
 
-            bookings.OrderBy(x => x.StartHour);
+            query = query.OrderByDescending(b => b.CreatedDate);
+
+            // Pagination: Get total count first
+            var totalCount = await query.CountAsync(cancellationToken);
 
             // If no bookings are found, return an empty list
-            if (!bookings.Any())
+            if (totalCount == 0)
             {
                 return new PagedResult<BookingDTO>
                 {
@@ -72,14 +87,15 @@ namespace Exe.Starot.Application.Booking.Queries.Filter
                 };
             }
 
-            // Pagination logic
-            var query = bookings.AsQueryable();
-            var totalCount = query.Count();
-            var items = query.Skip((request.PageNumber - 1) * request.PageSize)
-                             .Take(request.PageSize)
-                             .ToList();
+            // Get paginated items
+            var items = await query.Skip((request.PageNumber - 1) * request.PageSize)
+                                   .Take(request.PageSize)
+                                   .ToListAsync(cancellationToken);
 
+            // Calculate total page count
             var pageCount = (int)Math.Ceiling((double)totalCount / request.PageSize);
+
+            // Map entities to DTOs
             var dtos = _mapper.Map<List<BookingDTO>>(items);
 
             // Return paged result
@@ -92,6 +108,7 @@ namespace Exe.Starot.Application.Booking.Queries.Filter
                 PageSize = request.PageSize
             };
         }
+
     }
 
 }

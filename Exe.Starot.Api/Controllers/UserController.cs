@@ -1,7 +1,9 @@
 ﻿using Exe.Starot.Application.Booking.Commands.DeleteBooking;
 using Exe.Starot.Application.Customer.Queries.Filter;
+using Exe.Starot.Application.User;
 using Exe.Starot.Application.User.Delete;
 using Exe.Starot.Application.User.Filter;
+using Exe.Starot.Application.User.GetInfo;
 using Exe.Starot.Domain.Common.Exceptions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -34,6 +36,34 @@ namespace Exe.Starot.Api.Controllers
             {
                 var result = await _mediator.Send(query, cancellationToken);
                 return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new JsonResponse<string>(StatusCodes.Status500InternalServerError, ex.Message, ""));
+            }
+        }
+
+        [HttpGet("info")]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult> GetUserInfo(
+            CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                var result = await _mediator.Send(new GetUserInfo(), cancellationToken);
+                return Ok(new JsonResponse<UserDTO>(StatusCodes.Status200OK, "Get Success", result));
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new JsonResponse<string>(StatusCodes.Status404NotFound, ex.Message, ""));
+            }
+            catch (UnauthorizedException ex)
+            {
+                return Unauthorized(new JsonResponse<string>(StatusCodes.Status401Unauthorized, ex.Message, ""));
             }
             catch (Exception ex)
             {

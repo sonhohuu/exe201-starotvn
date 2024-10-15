@@ -26,7 +26,7 @@ namespace Exe.Starot.Application.User.Authenticate
 
         public async Task<UserLoginDTO> Handle(LoginQuery request, CancellationToken cancellationToken)
         {
-            var user = await _userRepository.FindAsync(u => u.Email == request.Email);
+            var user = await _userRepository.FindAsync(u => u.Email == request.Email && !u.DeletedDay.HasValue, cancellationToken);
 
             if (user == null || !_userRepository.VerifyPassword(request.Password, user.PasswordHash))
             {

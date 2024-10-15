@@ -10,7 +10,7 @@ namespace Exe.Starot.Application.Order.Filter
 {
     public class FilterOrderQuery : IRequest<PagedResult<OrderDTO>>
     {
-        public string? UserID { get; set; }
+        public string? UserName { get; set; }
         public bool? SortOrder { get; set; }
         public string? Status { get; set; }
   

@@ -2,6 +2,7 @@
 using Exe.Starot.Domain.Common.Exceptions;
 using Exe.Starot.Domain.Entities.Base;
 using Exe.Starot.Domain.Entities.Repositories;
+using Exe.Starot.Infrastructure.Repositories;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -25,14 +26,16 @@ namespace Exe.Starot.Application.Booking.Commands.CreateBooking
         private readonly IReaderRepository _readerRepository;
         private readonly IPackageQuestionRepository _packageQuestionRepository;
         private readonly ICustomerRepository _customerRepository;
+        private readonly IUserRepository _userRepository;
 
-        public CreateBookingCommandHandler(IBookingRepository bookingRepository, ICurrentUserService currentUserService, IReaderRepository readerRepository, IPackageQuestionRepository packageQuestionRepository, ICustomerRepository customerRepository)
+        public CreateBookingCommandHandler(IBookingRepository bookingRepository, ICurrentUserService currentUserService, IReaderRepository readerRepository, IPackageQuestionRepository packageQuestionRepository, ICustomerRepository customerRepository, IUserRepository userRepository)
         {
             _bookingRepository = bookingRepository;
             _currentUserService = currentUserService;
             _readerRepository = readerRepository;
             _packageQuestionRepository = packageQuestionRepository;
             _customerRepository = customerRepository;
+            _userRepository = userRepository;
         }
 
         public async Task<string> Handle(CreateBookingCommand request, CancellationToken cancellationToken)
@@ -72,25 +75,36 @@ namespace Exe.Starot.Application.Booking.Commands.CreateBooking
                 x => x.Date == date &&
                      x.StartHour == startHour &&
                      !x.DeletedDay.HasValue &&
+                     x.Status != "Đã hủy" &&
                      (
-                         (x.ReaderId == request.ReaderId) || // Same reader and same package
-                         (x.CustomerId == customerId && x.ReaderId != request.ReaderId) // Same customer with different reader
+                         (x.Reader.UserId == request.ReaderId) || // Same reader and same package
+                         (x.CustomerId == customerId && x.Reader.UserId != request.ReaderId) // Same customer with different reader
                      ),
                 cancellationToken);
 
             if (existingBooking != null)
-            {
-                if (existingBooking.ReaderId == request.ReaderId)
+            {   
+                if (existingBooking.Reader.UserId == request.ReaderId)
                 {
                     // Booking already exists with the same reader and same package at the same time
                     throw new DuplicationException($"This booking with {existingBooking.Reader.User.LastName} at time {existingBooking.StartHour} already ordered.");
                 }
-                else if (existingBooking.CustomerId == customerId)
+                else if (existingBooking.CustomerId == customerId && existingBooking.Reader.UserId != request.ReaderId)
                 {
                     // Customer already has a booking with another reader at the same time
                     throw new DuplicationException($"You already have a booking with {existingBooking.Reader.User.LastName} at time {existingBooking.StartHour}.");
                 }
             }
+
+            if (customer.User.Balance < existingPackage.Price)
+            {
+                // If balance is insufficient, return a failure message
+                throw new ArgumentException("Insufficient balance.");
+            }
+
+            // Deduct the user's balance
+            customer.User.Balance -= existingPackage.Price;
+            await _userRepository.UnitOfWork.SaveChangesAsync(cancellationToken);
 
             // Create new booking entity
             var booking = new BookingEntity
@@ -101,7 +115,7 @@ namespace Exe.Starot.Application.Booking.Commands.CreateBooking
                 StartHour = startHour,
                 Date = date,
                 EndHour = startHour,
-                Status = "Pending", // Default status to Pending 
+                Status = "Sắp diễn ra", // Default status to Pending 
                 LinkUrl = existingReader?.LinkUrl,
 
                 CreatedBy = _currentUserService.UserId, // Record who created the booking

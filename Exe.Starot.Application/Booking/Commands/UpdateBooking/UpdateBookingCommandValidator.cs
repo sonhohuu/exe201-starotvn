@@ -14,12 +14,11 @@ namespace Exe.Starot.Application.Booking.Commands.UpdateBooking
             RuleFor(x => x.BookingId)
                 .NotEmpty().WithMessage("BookingId is required.");
 
-            RuleFor(x => x.Status)
-                .Must(x => string.IsNullOrEmpty(x) ||
-                    x.Equals("Rejected", StringComparison.OrdinalIgnoreCase) ||
-                    x.Equals("Approved", StringComparison.OrdinalIgnoreCase) ||
-                    x.Equals("Pending", StringComparison.OrdinalIgnoreCase))
-                .WithMessage("Status must be either 'Rejected', 'Approved', 'Pending' or left empty.");
+            RuleFor(command => command.Status)
+                .NotEmpty().WithMessage("Status can't be empty or null")
+                .Must(status => new[] { "Sắp diễn ra", "Đang diễn ra", "Hoàn thành", "Đã hủy" }
+                .Contains(status))
+                .WithMessage("Status must be one of the following values: Sắp diễn ra,Đang diễn ra, Hoàn thành, Đã hủy");
         }
 
         private bool BeAValidStartDate(DateTime? startDate)
