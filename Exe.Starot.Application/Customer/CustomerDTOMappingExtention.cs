@@ -14,6 +14,9 @@ namespace Exe.Starot.Application.Customer
         public static CustomerDTO MapToCustomerDTO(this CustomerEntity projectFrom, IMapper mapper)
           => mapper.Map<CustomerDTO>(projectFrom);
 
+        public static CustomerWithInfoDTO MapToCustomerWithInfoDTO(this CustomerEntity projectFrom, IMapper mapper)
+          => mapper.Map<CustomerWithInfoDTO>(projectFrom);
+
         public static List<CustomerDTO> MapToCustomerDTOList(this IEnumerable<CustomerEntity> projectFrom, IMapper mapper)
           => projectFrom.Select(x => x.MapToCustomerDTO(mapper)).ToList();
     }

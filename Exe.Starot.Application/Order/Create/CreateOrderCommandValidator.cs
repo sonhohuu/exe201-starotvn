@@ -11,6 +11,15 @@ namespace Exe.Starot.Application.Order.Create
     {
         public CreateOrderCommandValidator()
         {
+
+            RuleFor(command => command.Address)
+                .NotEmpty().WithMessage("Address can't be empty or null");
+
+            RuleFor(command => command.PaymentMethod)
+                .NotEmpty().WithMessage("PaymentMethod can't be empty or null")
+                .Must(paymentMethod => paymentMethod == "Tiền Mặt" || paymentMethod == "Ví")
+                .WithMessage("Phương thức thanh toán phải là 'Tiền Mặt' hoặc 'Ví'.");
+
             RuleFor(command => command.Products)
                 .NotEmpty().WithMessage("Product's list can't be empty or null")
                 .Must(items => items != null && items.Count > 0).WithMessage("Items list must contain at least one item");

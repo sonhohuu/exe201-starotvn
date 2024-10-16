@@ -7,13 +7,16 @@ using System.Threading.Tasks;
 
 namespace Exe.Starot.Application.Order.Create
 {
-    public class CreateOrderCommand : IRequest<OrderDTO>
+    public class CreateOrderCommand : IRequest<string>
     {
+
         public CreateOrderCommand(List<RequestItem> products)
         {
             Products = products;
            
         }
+        public string Address { get; set; }
+        public string PaymentMethod { get; set; }
         public List<RequestItem> Products { get; set; }
     }
 

@@ -10,6 +10,5 @@ namespace Exe.Starot.Application.FavoriteProduct.Get
 {
     public class GetFavoriteProductsByUserQuery : IRequest<IEnumerable<FavoriteProductDto>>
     {
-        public string UserId { get; set; }
     }
 }

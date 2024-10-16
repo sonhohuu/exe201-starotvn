@@ -26,7 +26,7 @@ namespace Exe.Starot.Infrastructure.Repositories
             }
 
             return await _dbContext.OrderDetails
-                .Where(od => productIds.Contains(od.ProductId))
+                .Where(od => productIds.Contains(od.ProductId) && od.Order.Status != "Đã hủy")
                 .GroupBy(od => od.ProductId)
                 .Select(g => new { ProductId = g.Key, TotalAmount = g.Sum(od => od.Amount) }) // Sum up the Amount for each product
                 .ToDictionaryAsync(x => x.ProductId, x => x.TotalAmount, cancellationToken);

@@ -77,7 +77,7 @@ namespace Exe.Starot.Application.PayOs
                 var existUser = await _userRepository.FindAsync(x => x.ID == transaction.UserId && !x.DeletedDay.HasValue);
                 if (existUser != null)
                 {
-                    existUser.Balance += transaction.Amount / 1000;
+                    existUser.Balance += transaction.Amount;
                     _userRepository.Update(existUser);
                     await _userRepository.UnitOfWork.SaveChangesAsync();
                     return new ResultModel { IsSuccess = true, Code = 0, Message = "Payment success" };

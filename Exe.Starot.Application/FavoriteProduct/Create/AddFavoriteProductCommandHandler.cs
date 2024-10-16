@@ -1,4 +1,5 @@
-﻿using Exe.Starot.Domain.Common.Exceptions;
+﻿using Exe.Starot.Application.Common.Interfaces;
+using Exe.Starot.Domain.Common.Exceptions;
 using Exe.Starot.Domain.Entities.Base;
 using Exe.Starot.Domain.Entities.Repositories;
 using MediatR;
@@ -15,58 +16,48 @@ namespace Exe.Starot.Application.FavoriteProduct.Create
         private readonly IFavoriteProductRepository _favoriteProductRepository;
         private readonly IProductRepository _productRepository;
         private readonly IUserRepository _userRepository;
-        public AddFavoriteProductCommandHandler(IFavoriteProductRepository favoriteProductRepository, IProductRepository productRepository, IUserRepository userRepository)
+        private readonly ICurrentUserService _currentUserService;
+        public AddFavoriteProductCommandHandler(IFavoriteProductRepository favoriteProductRepository, IProductRepository productRepository, IUserRepository userRepository, ICurrentUserService currentUserService)
         {
             _favoriteProductRepository = favoriteProductRepository;
             _productRepository = productRepository;
             _userRepository = userRepository;
+            _currentUserService = currentUserService;
         }
 
         public async Task<string> Handle(AddFavoriteProductCommand request, CancellationToken cancellationToken)
         {
-            var product = await _productRepository.FindAsync(p => p.ID == request.ProductId, cancellationToken);
+            var product = await _productRepository.FindAsync(p => p.ID == request.ProductId && !p.DeletedDay.HasValue, cancellationToken);
             if (product == null)
             {
                 throw new NotFoundException("Product not found.");
             }
-            var user = await _userRepository.FindAsync(u => u.ID == request.UserId, cancellationToken);
+            var user = await _userRepository.FindAsync(u => u.ID == _currentUserService.UserId && !u.DeletedDay.HasValue, cancellationToken);
             if (user == null)
             {
-                throw new NotFoundException("User not found.");
+                throw new UnauthorizedException("User not login.");
             }
 
             //find favorite product
             var favoriteProduct = await _favoriteProductRepository.FindAsync(fp =>
-             fp.ProductId == request.ProductId && fp.UserId == request.UserId, cancellationToken);
+                fp.ProductId == request.ProductId && fp.UserId == user.ID, cancellationToken);
 
-            if (request.IsFavorite)
+            if (favoriteProduct == null)
             {
-                // Add to favorites
-                if (favoriteProduct != null)
-                {
-                    return "Product is already in the user's favorites.";
-                }
-
                 var newFavorite = new FavoriteProductEntity
                 {
                     ProductId = request.ProductId,
-                    UserId = request.UserId
+                    UserId = user.ID,
+                    IsFavorite = true
                 };
 
                 _favoriteProductRepository.Add(newFavorite);
             }
             else
             {
-                // Remove from favorites
-                if (favoriteProduct == null)
-                {
-                    return "Product is not in the user's favorites.";
-                }
-                _favoriteProductRepository.Remove(favoriteProduct);
-
+                favoriteProduct.IsFavorite = !favoriteProduct.IsFavorite;
             }
-            await _favoriteProductRepository.UnitOfWork.SaveChangesAsync(cancellationToken);
-            return request.IsFavorite ? "Product added to favorites." : "Product removed from favorites.";
+            return await _favoriteProductRepository.UnitOfWork.SaveChangesAsync(cancellationToken) > 0 ? "Update success" : "Update failed";
         }
     }
 }

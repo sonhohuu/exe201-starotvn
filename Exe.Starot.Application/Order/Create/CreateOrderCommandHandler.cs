@@ -6,13 +6,14 @@ using Exe.Starot.Domain.Entities.Repositories;
 using MediatR;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Exe.Starot.Application.Order.Create
 {
-    public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, OrderDTO>
+    public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, string>
     {
         private readonly OrderService _orderService;
         private readonly IOrderRepository _orderRepository;
@@ -33,40 +34,23 @@ namespace Exe.Starot.Application.Order.Create
             _orderService = orderService;   
         }
 
-        public async Task<OrderDTO> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
+        public async Task<string> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
         {
             var user = _currentUserService.UserId;
+            if (user == null)
+            {
+                throw new UnauthorizedException("User not login");
+            }
+
             var userExist = await _userRepository.FindAsync(x => x.ID == user && x.DeletedDay == null, cancellationToken);
+
             if (userExist is null)
             {
                 throw new NotFoundException("User does not exist");
             }
-            foreach (var item in request.Products)
-            {
-                bool productExist = await _productRepository.AnyAsync(x => x.ID == item.ProductID && !x.DeletedDay.HasValue, cancellationToken);
 
-                if (!productExist)
-                {
-                    throw new NotFoundException($"Product with ID {item.ProductID} is not found or deleted");
-                }
-            }
-
+            // Calculate the total order price before creating the order
             decimal orderTotal = 0;
-
-            var order = new OrderEntity
-            {
-                UserId = userExist.ID,
-                Status = "Pending",
-                Code = GenerateOrderCode(),
-                CreatedBy = _currentUserService.UserId,
-                CreatedDate = DateTime.UtcNow,
-                Total = 0 
-            };
-
-            _orderRepository.Add(order);
-            await _orderRepository.UnitOfWork.SaveChangesAsync(cancellationToken);
-
-            var orderID = order.ID;
 
             foreach (var item in request.Products)
             {
@@ -76,7 +60,58 @@ namespace Exe.Starot.Application.Order.Create
                 {
                     throw new NotFoundException($"Product with ID {item.ProductID} is not found or deleted");
                 }
+
+                orderTotal += item.Quantity * product.Price;
+            }
+
+            // Handle PaymentMethod logic before creating the order
+            if (request.PaymentMethod == "Ví")
+            {
+                // If payment method is 'Ví', check if the user's balance is sufficient
+                if (userExist.Balance < orderTotal)
+                {
+                    // If balance is insufficient, return a failure message
+                    throw new ArgumentException("Insufficient balance.");
+                }
+
+                // Deduct the user's balance
+                userExist.Balance -= orderTotal;
+                await _userRepository.UnitOfWork.SaveChangesAsync(cancellationToken);
+            }
+            else if (request.PaymentMethod != "Tiền Mặt")
+            {
+                throw new ValidationException("Invalid Payment Method.");
+            }
+
+
+            // Now that balance is checked and sufficient, create the order
+            var order = new OrderEntity
+            {
+                UserId = userExist.ID,
+                Code = GenerateOrderCode(),
+                CreatedBy = _currentUserService.UserId,
+                CreatedDate = DateTime.UtcNow,
+                Address = request.Address,  
+                OrderDate = DateTime.UtcNow.AddHours(7).ToString("dd/MM/yyyy"),
+                OrderTime = DateTime.UtcNow.AddHours(7).ToString("HH:mm"),
+                Total = orderTotal,
+                Status = "Đang xác nhận đơn hàng", // Set status based on payment method
+                PaymentMethod = request.PaymentMethod
+            };
+
+            // Add the order to the repository
+            _orderRepository.Add(order);
+            await _orderRepository.UnitOfWork.SaveChangesAsync(cancellationToken);
+
+            var orderID = order.ID;
+
+            // Create order details after creating the order
+            foreach (var item in request.Products)
+            {
+                var product = await _productRepository.FindAsync(x => x.ID == item.ProductID && !x.DeletedDay.HasValue, cancellationToken);
+
                 decimal productPrice = item.Quantity * product.Price;
+
                 var orderDetail = new OrderDetailEntity
                 {
                     OrderId = order.ID,
@@ -87,17 +122,17 @@ namespace Exe.Starot.Application.Order.Create
                     CreatedDate = DateTime.UtcNow,
                     Status = true
                 };
+
                 _orderDetailRepository.Add(orderDetail);
-                orderTotal += productPrice; // Update total for the order
                 await _orderDetailRepository.UnitOfWork.SaveChangesAsync(cancellationToken);
-
-
             }
-            order.Total = orderTotal;
-            await _orderRepository.UnitOfWork.SaveChangesAsync(cancellationToken);
+
+            // Notify about the new order
             await _orderService.NotifyNewOrder(orderID.ToString());
-            return order.MapToOrderDTO(_mapper);
+
+            return "Create Order Successful!";
         }
+
 
         private string GenerateOrderCode()
         {

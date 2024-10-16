@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Exe.Starot.Application.Common.Interfaces;
 using Exe.Starot.Domain.Common.Exceptions;
 using Exe.Starot.Domain.Entities.Repositories;
 using MediatR;
@@ -11,27 +12,32 @@ using System.Threading.Tasks;
 
 namespace Exe.Starot.Application.Reader.Queries.GetById
 {
-    public class GetReaderByIdQuery : IRequest<ReaderDTO>
+    public class GetReaderByIdQuery : IRequest<ReaderWithInfoDTO>
     {
-        [Required]
-        public required string Id { get; set; }
     }
 
-    public class GetReaderByIdQueryHandler : IRequestHandler<GetReaderByIdQuery, ReaderDTO>
+    public class GetReaderByIdQueryHandler : IRequestHandler<GetReaderByIdQuery, ReaderWithInfoDTO>
     {
         private readonly IReaderRepository _readerRepository;
+        private readonly ICurrentUserService _currentUserService;
         private readonly IMapper _mapper;
 
-        public GetReaderByIdQueryHandler(IReaderRepository readerRepository, IMapper mapper)
+        public GetReaderByIdQueryHandler(IReaderRepository readerRepository, IMapper mapper, ICurrentUserService currentUserService)
         {
             _readerRepository = readerRepository;
+            _currentUserService = currentUserService;
             _mapper = mapper;
         }
 
-        public async Task<ReaderDTO> Handle(GetReaderByIdQuery request, CancellationToken cancellationToken)
+        public async Task<ReaderWithInfoDTO> Handle(GetReaderByIdQuery request, CancellationToken cancellationToken)
         {
+            var userId = _currentUserService.UserId;
+            if (userId == null)
+            {
+                throw new UnauthorizedException("User not login");
+            }
             // Find the reader by Id
-            var reader = await _readerRepository.FindAsync(r => r.User.ID == request.Id && r.DeletedDay == null, cancellationToken);
+            var reader = await _readerRepository.FindAsync(r => r.User.ID == userId && r.DeletedDay == null, cancellationToken);
 
             if (reader == null)
             {
@@ -39,7 +45,7 @@ namespace Exe.Starot.Application.Reader.Queries.GetById
             }
 
             // Map the reader entity to ReaderDTO
-            var dto = reader.MapToReaderDTO(_mapper);
+            var dto = reader.MapToReaderWithInfoDTO(_mapper);
 
             return dto;
         }

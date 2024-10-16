@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
+using Exe.Starot.Application.Common.Interfaces;
 using Exe.Starot.Application.Common.Pagination;
+using Exe.Starot.Domain.Entities.Repositories;
 using Exe.Starot.Infrastructure.Persistence;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -15,23 +17,33 @@ namespace Exe.Starot.Application.Order.Filter
     {
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
-        public FilterOrderQueryHandler(ApplicationDbContext context, IMapper mapper)
+        private readonly ICurrentUserService _currentUserService;
+        private readonly IUserRepository _userRepository;
+        public FilterOrderQueryHandler(ApplicationDbContext context, IMapper mapper, ICurrentUserService currentUserService, IUserRepository userRepository)
         {
             _mapper = mapper;
             _context = context;
+            _currentUserService = currentUserService;
+            _userRepository = userRepository;
         }
 
         public async Task<PagedResult<OrderDTO>> Handle(FilterOrderQuery request, CancellationToken cancellationToken)
         {
             var query = _context.Orders.AsQueryable();
 
-            query.Where(p => !p.DeletedDay.HasValue);
-
-            query.OrderByDescending(p => p.CreatedDate);
-
-            if (!string.IsNullOrEmpty(request.UserID))
+            var user = await _userRepository.FindAsync(x => x.ID == _currentUserService.UserId && !x.DeletedDay.HasValue, cancellationToken);
+            if (user != null && user.Role == "Customer")
             {
-                query = query.Where(p => p.UserId.Contains(request.UserID));
+                query = query.Where(p => p.UserId == _currentUserService.UserId);
+            }
+
+            query = query.Where(p => !p.DeletedDay.HasValue);
+
+            query = query.OrderByDescending(p => p.CreatedDate);
+
+            if (!string.IsNullOrEmpty(request.UserName))
+            {
+                query = query.Where(p => (p.User.FirstName + " " +p.User.LastName).Contains(request.UserName));
             }
 
          

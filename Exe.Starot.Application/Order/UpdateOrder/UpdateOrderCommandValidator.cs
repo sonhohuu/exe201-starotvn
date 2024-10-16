@@ -16,9 +16,9 @@ namespace Exe.Starot.Application.Order.UpdateOrder
 
             RuleFor(command => command.Status)
                 .NotEmpty().WithMessage("Status can't be empty or null")
-                .Must(status => new[] { "OnPreparing", "Prepared", "OnDelivering", "Delivered" }
+                .Must(status => new[] { "Đang xác nhận đơn hàng", "Đang giao hàng", "Đã giao hàng", "Đã hủy" }
                 .Contains(status))
-                .WithMessage("Status must be one of the following values: OnPreparing, Prepared, OnDelivering, Delivered");
+                .WithMessage("Status must be one of the following values: Đang xác nhận đơn hàng, Đang giao hàng, Đã giao hàng, Đã hủy");
         }
     }
 }

@@ -72,7 +72,7 @@ namespace Exe.Starot.Api.Controllers
             }
         }
 
-        [HttpGet("{readerId}")]
+        [HttpGet("info")]
         [Produces(MediaTypeNames.Application.Json)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -80,19 +80,26 @@ namespace Exe.Starot.Api.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> GetReaderById(
-            [FromRoute] string readerId,
             CancellationToken cancellationToken = default)
         {
             try
             {
-                var result = await _mediator.Send(new GetReaderByIdQuery { Id = readerId }, cancellationToken);
+                var result = await _mediator.Send(new GetReaderByIdQuery(), cancellationToken);
 
                 if (result == null)
                 {
-                    return NotFound(new JsonResponse<string>(StatusCodes.Status404NotFound, "PackageQuestion not found.", ""));
+                    return NotFound(new JsonResponse<string>(StatusCodes.Status404NotFound, "Reader not found.", ""));
                 }
 
-                return Ok(new JsonResponse<ReaderDTO>(StatusCodes.Status200OK, "Get Sucess", result));
+                return Ok(new JsonResponse<ReaderWithInfoDTO>(StatusCodes.Status200OK, "Get Sucess", result));
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new JsonResponse<string>(StatusCodes.Status404NotFound, ex.Message, ""));
+            }
+            catch (UnauthorizedException ex)
+            {
+                return Unauthorized(new JsonResponse<string>(StatusCodes.Status401Unauthorized, ex.Message, ""));
             }
             catch (Exception ex)
             {
