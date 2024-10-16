@@ -17,7 +17,7 @@ namespace Exe.Starot.Infrastructure
             services.AddDbContext<ApplicationDbContext>((sp, options) =>
             {
                 options.UseSqlServer(
-                    configuration.GetConnectionString("local"),
+                    configuration.GetConnectionString("server"),
                     b =>
                     {
                         b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName);

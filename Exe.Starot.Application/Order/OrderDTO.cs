@@ -21,7 +21,7 @@ namespace Exe.Starot.Application.Order
         public string Address { get; set; }
         public string UserName { get; set; }
         public string Phone { get; set; }
-
+        public string PaymentMethod { get; set; }
         public List<ResponseItem> Products { get; set; } = new List<ResponseItem>();
 
         public void Mapping(Profile profile)

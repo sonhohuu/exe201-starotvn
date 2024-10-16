@@ -20,11 +20,6 @@ namespace Exe.Starot.Application.Booking.Commands.UpdateBooking
                 .Contains(status))
                 .WithMessage("Status must be one of the following values: Sắp diễn ra,Đang diễn ra, Hoàn thành, Đã hủy");
         }
-
-        private bool BeAValidStartDate(DateTime? startDate)
-        {
-            return startDate > DateTime.UtcNow;
-        }
     }
 
 

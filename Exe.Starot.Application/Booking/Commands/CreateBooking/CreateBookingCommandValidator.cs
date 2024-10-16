@@ -19,14 +19,26 @@ namespace Exe.Starot.Application.Booking.Commands.CreateBooking
                 .NotEmpty().WithMessage("ReaderId is required.");
 
             RuleFor(x => x.StartDate)
-                .Must(BeAValidStartDate).WithMessage("StartDate must be in the future.");
+                .Must(BeAValidStartDate)
+                .WithMessage("StartDate must be at least one day in the future and within the time range of 09:00 to 21:00.");
+
         }
 
         // Custom validator to check if StartDate is in the future
         private bool BeAValidStartDate(DateTime startDate)
         {
-            return startDate > DateTime.UtcNow;
+            // Ensure the date is at least one day in the future
+            if (startDate <= DateTime.UtcNow.AddDays(1))
+                return false;
+
+            // Ensure the time is between 09:00 and 21:00
+            var startHour = startDate.TimeOfDay;
+            var validStart = new TimeSpan(9, 0, 0);  // 09:00
+            var validEnd = new TimeSpan(21, 0, 0);   // 21:00
+
+            return startHour >= validStart && startHour <= validEnd;
         }
+
     }
 
 }

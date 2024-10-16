@@ -69,6 +69,8 @@ namespace Exe.Starot.Application.Booking.Queries.Filter
                 query = query.Where(b => b.Date == request.Date);
             }
 
+            query = query.Where(b => !b.DeletedDay.HasValue);
+
             query = query.OrderByDescending(b => b.CreatedDate);
 
             // Pagination: Get total count first

@@ -50,9 +50,9 @@ namespace Exe.Starot.Application.Order.UpdateOrder
                 throw new ArgumentException("Không thể hủy đơn hàng đã hủy");
             }
 
-            if (orderExist.Status == "Đã giao" && request.Status == "Đã hủy")
+            if ((orderExist.Status == "Đã giao" || orderExist.Status == "Đang giao hàng") && request.Status == "Đã hủy")
             {
-                throw new ArgumentException("Không thể hủy đơn hàng đã giao");
+                throw new ArgumentException("Không thể hủy đơn hàng đang hoặc đã giao");
             } else if(request.Status == "Đã Hủy")
             {
                 var userOrder = await _userRepository.FindAsync(x => x.ID == orderExist.UserId && !x.DeletedDay.HasValue, cancellationToken);
