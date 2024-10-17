@@ -19,6 +19,7 @@ namespace Exe.Starot.Application.User
         public string? Phone { get; set; }
         public string? DateOfBirth { get; set; }
         public string? Gender { get; set; }
+        public string? Image {  get; set; }
         public decimal? Balance { get; set; }
 
         public void Mapping(Profile profile)

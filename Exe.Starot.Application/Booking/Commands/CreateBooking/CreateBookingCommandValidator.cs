@@ -33,8 +33,8 @@ namespace Exe.Starot.Application.Booking.Commands.CreateBooking
 
             // Ensure the time is between 09:00 and 21:00
             var startHour = startDate.TimeOfDay;
-            var validStart = new TimeSpan(9, 0, 0);  // 09:00
-            var validEnd = new TimeSpan(21, 0, 0);   // 21:00
+            var validStart = new TimeSpan(18, 0, 0);  // 09:00
+            var validEnd = new TimeSpan(23, 0, 0);   // 21:00
 
             return startHour >= validStart && startHour <= validEnd;
         }
