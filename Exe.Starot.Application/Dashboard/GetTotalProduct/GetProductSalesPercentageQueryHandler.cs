@@ -49,8 +49,6 @@ namespace Exe.Starot.Application.Dashboard.GetTotalProduct
                 })
                 .ToList();
 
-        
-
             if (!orderDetails.Any())
             {
  
