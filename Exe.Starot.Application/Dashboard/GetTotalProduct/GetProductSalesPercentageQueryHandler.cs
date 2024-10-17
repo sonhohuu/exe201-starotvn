@@ -23,45 +23,41 @@ namespace Exe.Starot.Application.Dashboard.GetTotalProduct
 
         public async Task<List<ProductSalesPercentageDTO>> Handle(GetProductSalesPercentageQuery request, CancellationToken cancellationToken)
         {
-            var allOrderDetails = await _orderDetailRepository
-                                            .FindAllAsync(cancellationToken);
+            int month = request.Month > 0 ? request.Month : DateTime.Now.Month;
+            int year = request.Year > 0 ? request.Year : DateTime.Now.Year;
+
+            var allOrderDetails = await _orderDetailRepository.FindAllAsync(cancellationToken);
 
             if (allOrderDetails == null || !allOrderDetails.Any())
             {
-               
                 return new List<ProductSalesPercentageDTO>();
             }
 
-           
-            string dateFormat = "dd/MM/yyyy";
-
+            // Filter by year and month
             var orderDetails = allOrderDetails
                 .Where(od =>
                 {
-                    // Parse the OrderDate based on the correct date format
-                    if (!DateTime.TryParseExact(od.Order.OrderDate, dateFormat, null, System.Globalization.DateTimeStyles.None, out var date))
+                    if (!DateTime.TryParseExact(od.Order.OrderDate, "dd/MM/yyyy", null, System.Globalization.DateTimeStyles.None, out var date))
                     {
                         return false;
                     }
 
-                    // Filter by year and month
-                    return date.Month == request.Month && date.Year == request.Year;
+                    return date.Month == month && date.Year == year;
                 })
                 .ToList();
 
             if (!orderDetails.Any())
             {
- 
                 return new List<ProductSalesPercentageDTO>();
             }
 
             var totalProductsSold = orderDetails.Sum(od => od.Amount);
-           
-
             if (totalProductsSold == 0)
             {
                 return new List<ProductSalesPercentageDTO>();
             }
+
+            // Prepare the result list with percentage calculation
             var productSalesPercentageList = orderDetails
                 .GroupBy(od => od.ProductId)
                 .Select(g => new ProductSalesPercentageDTO
@@ -74,7 +70,6 @@ namespace Exe.Starot.Application.Dashboard.GetTotalProduct
 
             return productSalesPercentageList;
         }
-
     }
 }
 

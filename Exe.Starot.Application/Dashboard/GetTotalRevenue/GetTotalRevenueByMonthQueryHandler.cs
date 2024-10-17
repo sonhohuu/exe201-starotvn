@@ -4,7 +4,7 @@ using MediatR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Exe.Starot.Application.Dashboard.GetTotalRevenue
@@ -29,7 +29,10 @@ namespace Exe.Starot.Application.Dashboard.GetTotalRevenue
         {
             string dateFormat = "dd/MM/yyyy";
 
-            // Fetch all order details
+            // Set default year to the current year if not provided
+            int year = request.Year > 0 ? request.Year : DateTime.Now.Year;
+
+            // Fetch all order details and bookings
             var allOrderDetails = await _orderDetailRepository.FindAllAsync(cancellationToken);
             var allBookings = await _bookingRepository.FindAllAsync(cancellationToken);
 
@@ -49,8 +52,8 @@ namespace Exe.Starot.Application.Dashboard.GetTotalRevenue
                         return false;
                     }
 
-                    // Filter by the requested year
-                    return date.Year == request.Year;
+                    // Filter by the provided year or default year
+                    return date.Year == year;
                 })
                 .GroupBy(od => DateTime.ParseExact(od.Order.OrderDate, dateFormat, null).Month)
                 .Select(g => new
@@ -70,8 +73,8 @@ namespace Exe.Starot.Application.Dashboard.GetTotalRevenue
                         return false;
                     }
 
-                    // Filter by the requested year
-                    return b.CreatedDate.Value.Year == request.Year;
+                    // Filter by the provided year or default year
+                    return b.CreatedDate.Value.Year == year;
                 })
                 .GroupBy(b => b.CreatedDate.Value.Month)
                 .Select(g => new
