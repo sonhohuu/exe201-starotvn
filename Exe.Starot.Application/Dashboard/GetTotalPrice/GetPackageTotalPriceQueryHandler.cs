@@ -22,22 +22,39 @@ namespace Exe.Starot.Application.Dashboard.GetTotalPrice
 
         public async Task<List<PackageTotalPriceDTO>> Handle(GetPackageTotalPriceQuery request, CancellationToken cancellationToken)
         {
-            // Get all packages that are not deleted
+            // Set default month and year to the current month and year if not provided
+            int month = request.Month > 0 ? request.Month : DateTime.Now.Month;
+            int year = request.Year > 0 ? request.Year : DateTime.Now.Year;
+
             var packages = await _packageQuestionRepository.FindAllAsync(t => t.DeletedDay == null, cancellationToken);
 
-            // Calculate total price across all packages
-            var overallTotalPrice = packages.Sum(p => p.Bookings.Count() * p.Price);
+            // Filter bookings by month and year based on CreatedDate
+            var filteredPackages = packages
+                .Select(p => new
+                {
+                    Package = p,
+                    Bookings = p.Bookings.Where(b => b.CreatedDate != null &&
+                                                      b.CreatedDate.Value.Month == month &&
+                                                      b.CreatedDate.Value.Year == year).ToList()
+                })
+                .Where(p => p.Bookings.Any()) // Only keep packages with bookings in the specified period
+                .ToList();
 
-            // Prepare the list of PackageTotalPriceDTO with the percentage calculation
-            var packageTotals = packages.Select(p => new PackageTotalPriceDTO
-            {
-                PackageId = p.ID,
-                Name = p.Name,
-                BookingCount = p.Bookings.Count(),
-                TotalPrice = p.Bookings.Count() * p.Price,
-                PricePercentage = (p.Bookings.Count() * p.Price) / overallTotalPrice * 100  // Calculate percentage
-            }).ToList();
-              
+            // Calculate overall total price
+            var overallTotalPrice = filteredPackages.Sum(p => p.Bookings.Count * p.Package.Price);
+
+            // Prepare the result list with the percentage calculation
+            var packageTotals = filteredPackages
+                .Select(p => new PackageTotalPriceDTO
+                {
+                    PackageId = p.Package.ID,
+                    Name = p.Package.Name,
+                    BookingCount = p.Bookings.Count(),
+                    TotalPrice = p.Bookings.Count() * p.Package.Price,
+                    PricePercentage = (p.Bookings.Count() * p.Package.Price) / overallTotalPrice * 100
+                })
+                .ToList();
+
             return packageTotals;
         }
     }

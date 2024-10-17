@@ -21,11 +21,11 @@ namespace Exe.Starot.Api.Controllers
         [Produces(MediaTypeNames.Application.Json)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> GetPackageTotalPrices(CancellationToken cancellationToken = default)
+        public async Task<ActionResult> GetPackageTotalPrices([FromQuery] int month, [FromQuery] int year,CancellationToken cancellationToken = default)
         {
             try
             {
-                var result = await _mediator.Send(new GetPackageTotalPriceQuery(), cancellationToken);
+                var result = await _mediator.Send(new GetPackageTotalPriceQuery(month, year), cancellationToken);
                 return Ok(new JsonResponse<List<PackageTotalPriceDTO>>(StatusCodes.Status200OK, "Total prices retrieved successfully", result));
             }
             catch (Exception ex)
