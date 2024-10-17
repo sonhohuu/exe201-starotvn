@@ -30,7 +30,7 @@ namespace Exe.Starot.Api.Installer
             {
                 options.AddPolicy("CorsPolicy",
                     builder => builder
-                        .WithOrigins("https://localhost:7024")
+                        .WithOrigins("https://starotvn.com", "https://localhost:7024", "http://localhost:7024")
                         .AllowAnyHeader()
                         .AllowAnyMethod()
                         .AllowCredentials());
