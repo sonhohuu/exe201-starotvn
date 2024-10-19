@@ -8,6 +8,7 @@ using Exe.Starot.Domain.Entities.Repositories;
 using IdentityModel;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using System.Net.Mime;
 using System.Security.Claims;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
@@ -63,7 +64,11 @@ namespace Exe.Starot.Api.Controllers
             {
                 return BadRequest(new JsonResponse<string>(StatusCodes.Status400BadRequest, ex.Message, ""));
             }
+
+
         }
+
+        
     }
 
 }

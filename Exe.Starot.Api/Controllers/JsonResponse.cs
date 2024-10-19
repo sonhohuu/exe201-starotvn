@@ -2,6 +2,13 @@
 {
     public class JsonResponse<T>
     {
+        private object value;
+
+        public JsonResponse(object value)
+        {
+            this.value = value;
+        }
+
         public JsonResponse(int status, string message, T data)
         {
             Status = status;

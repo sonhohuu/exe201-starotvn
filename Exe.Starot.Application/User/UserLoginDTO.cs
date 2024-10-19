@@ -11,7 +11,9 @@ namespace Exe.Starot.Application.User
 {
     public class UserLoginDTO : IMapFrom<UserEntity>
     {
-        
+        public string Email { get; set; }
+        public string Role { get; set; }
+        public string EntityId { get; set; }
         public string Token { get; set; }
         public string RefreshToken { get; set; }
         public void Mapping(Profile profile)
