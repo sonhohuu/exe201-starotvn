@@ -19,14 +19,15 @@ namespace Exe.Starot.Api.Services
             _userRepository = userRepository;
         }
 
-        public string CreateToken(string entityId, string role, string email)
+        public string CreateToken(string entityId, string role, string email,string name)
         {
             var claims = new List<Claim>
         {
 
              new(JwtRegisteredClaimNames.Sub, entityId),
                 new(JwtClaimTypes.Email, email),
-                new(ClaimTypes.Role, role)
+                new(ClaimTypes.Role, role),
+                new(JwtClaimTypes.Name,name)
 
         };
 
@@ -137,7 +138,7 @@ namespace Exe.Starot.Api.Services
                 return null; // User not found or refresh token invalid
             }
 
-            var newJwtToken = CreateToken(user.ID, user.Role, user.Email);
+            var newJwtToken = CreateToken(user.ID, user.Role, user.Email,user.LastName);
             var newRefreshToken = GenerateRefreshToken();
 
             await _userRepository.UpdateRefreshTokenAsync(user, newRefreshToken, DateTime.UtcNow.AddDays(30));

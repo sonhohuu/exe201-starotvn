@@ -80,7 +80,7 @@ namespace Exe.Starot.Application.User.Register
             await _userRepository.UnitOfWork.SaveChangesAsync(cancellationToken);
 
             // Create JWT tokens for the new user
-            var accessToken = _jwtService.CreateToken(newUser.ID, newUser.Role, newUser.Email);
+            var accessToken = _jwtService.CreateToken(newUser.ID, newUser.Role, newUser.Email, newUser.FirstName);
             var refreshToken = _jwtService.GenerateRefreshToken();
 
             // Update the refresh token in the user repository
