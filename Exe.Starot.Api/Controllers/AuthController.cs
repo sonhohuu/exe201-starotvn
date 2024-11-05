@@ -54,7 +54,7 @@ namespace Exe.Starot.Api.Controllers
             try
             {
                 var result = await _mediator.Send(registerCommand, cancellationToken);
-                return Ok(new JsonResponse<UserLoginDTO>(StatusCodes.Status200OK, "Register Success", result)); ;
+                return Ok(new JsonResponse<string>(StatusCodes.Status200OK, "Register Success", result)); ;
             }
             catch (DuplicationException ex)
             {

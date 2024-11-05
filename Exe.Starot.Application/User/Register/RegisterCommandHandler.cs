@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Exe.Starot.Application.User.Register
 {
-    public class RegisterCommandHandler : IRequestHandler<RegisterCommand, UserLoginDTO>
+    public class RegisterCommandHandler : IRequestHandler<RegisterCommand, string>
     {
         private readonly IUserRepository _userRepository;
         private readonly IJwtService _jwtService;
@@ -30,12 +30,12 @@ namespace Exe.Starot.Application.User.Register
             _readerRepository = readerRepository;
         }
 
-        public async Task<UserLoginDTO> Handle(RegisterCommand request, CancellationToken cancellationToken)
+        public async Task<string> Handle(RegisterCommand request, CancellationToken cancellationToken)
         {
             // Check if password and re-password match
             if (request.Password != request.Repassword)
             {
-                throw new ArgumentException("Passwords do not match."); // You can customize this exception
+                throw new ArgumentException("Passwords do not match.");
             }
 
             // Check if a user with the same email already exists
@@ -48,17 +48,15 @@ namespace Exe.Starot.Application.User.Register
 
             if (request.Role != "Customer" && request.Role != "Reader")
             {
-                throw new ArgumentException("Role accepted: Customer, Reader"); // Handle appropriately
+                throw new ArgumentException("Role accepted: Customer, Reader");
             }
 
             // Create a new user entity
             var newUser = new UserEntity
             {
                 Email = request.Email,
-                // Assume you have additional properties like Password, Name, etc. from RegisterCommand
-                PasswordHash = HashPassword(request.Password), // Ensure to hash the password
-                Role = request.Role ?? "" // Set default role or whatever your logic requires
-                                    // Set other properties as necessary
+                PasswordHash = HashPassword(request.Password),
+                Role = request.Role ?? ""
             };
 
             if (request.Role == "Customer")
@@ -68,7 +66,8 @@ namespace Exe.Starot.Application.User.Register
                     User = newUser
                 };
                 _customerRepository.Add(customer);
-            } else if (request.Role == "Reader")
+            }
+            else if (request.Role == "Reader")
             {
                 var reader = new ReaderEntity
                 {
@@ -79,27 +78,14 @@ namespace Exe.Starot.Application.User.Register
 
             await _userRepository.UnitOfWork.SaveChangesAsync(cancellationToken);
 
-            // Create JWT tokens for the new user
-            var accessToken = _jwtService.CreateToken(newUser.ID, newUser.Role, newUser.Email, newUser.FirstName);
-            var refreshToken = _jwtService.GenerateRefreshToken();
-
-            // Update the refresh token in the user repository
-            await _userRepository.UpdateRefreshTokenAsync(newUser, refreshToken, DateTime.UtcNow.AddDays(30));
-
-            // Map the new user to UserLoginDTO
-            var userLoginDto = _mapper.Map<UserLoginDTO>(newUser);
-            userLoginDto.Token = accessToken;
-            userLoginDto.RefreshToken = refreshToken;
-
-            return userLoginDto;
+            // Return success message
+            return "Registration successful!";
         }
 
         private string HashPassword(string password)
         {
-            // Implement your password hashing logic here
-            // For example, using BCrypt:
+            // Implement your password hashing logic here, e.g., using BCrypt:
             return BCrypt.Net.BCrypt.HashPassword(password);
         }
     }
-
 }
