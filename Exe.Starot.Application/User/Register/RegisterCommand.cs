@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Exe.Starot.Application.User.Register
 {
-    public class RegisterCommand : IRequest<UserLoginDTO>
+    public class RegisterCommand : IRequest<string>
     {
         public RegisterCommand() { }
 
@@ -31,6 +31,7 @@ namespace Exe.Starot.Application.User.Register
         [Required]
         [DataType(DataType.Password)]
         public string Repassword { get; set; }
+        public string Username { get; set; }
 
         [Required]
         public string Role { get; set; }

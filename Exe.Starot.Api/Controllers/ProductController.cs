@@ -31,9 +31,9 @@ namespace Exe.Starot.Api.Controllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> CreateProduct(
-    [FromForm] CreateProductCommand command,
-    CancellationToken cancellationToken = default)
-        {
+         [FromForm] CreateProductCommand command,
+        CancellationToken cancellationToken = default)
+           {
             try
             {
                 var result = await _mediator.Send(command, cancellationToken);
@@ -80,8 +80,8 @@ namespace Exe.Starot.Api.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> UpdateProduct(
-    [FromForm] UpdateProductCommand command,
-    CancellationToken cancellationToken = default)
+          [FromForm] UpdateProductCommand command,
+        CancellationToken cancellationToken = default)
         {
 
             try
